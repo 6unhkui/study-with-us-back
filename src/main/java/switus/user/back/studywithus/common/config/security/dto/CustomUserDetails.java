@@ -10,6 +10,9 @@ import switus.user.back.studywithus.domain.user.User;
 import java.util.Collection;
 import java.util.Collections;
 
+/**
+ * 인증 시 사용할 Custom User
+ */
 @Getter @Setter
 public class CustomUserDetails implements UserDetails {
 

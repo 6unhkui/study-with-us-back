@@ -10,10 +10,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import switus.user.back.studywithus.common.config.security.constant.SecurityConstants;
 import switus.user.back.studywithus.common.config.security.service.CustomUserDetailService;
-import switus.user.back.studywithus.exception.CommonRuntimeException;
-import switus.user.back.studywithus.exception.InternalServerException;
-import switus.user.back.studywithus.exception.InvalidTokenException;
+import switus.user.back.studywithus.common.error.exception.CommonRuntimeException;
+import switus.user.back.studywithus.common.error.exception.InternalServerException;
+import switus.user.back.studywithus.common.error.exception.InvalidTokenException;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -56,21 +57,16 @@ public class JwtTokenProvider {
     }
 
     // 유효한 토큰인지 체크
-    public boolean isValid(String token){
-        try {
-            Jws<Claims> claims = Jwts.parser()
+    public boolean validateToken(String token) throws SignatureException {
+        Jws<Claims> claims = Jwts.parser()
                     .setSigningKey(secretKey)
                     .parseClaimsJws(token);
-            return !claims.getBody().getExpiration().before(new Date());
-        } catch(Exception e){
-            e.printStackTrace();
-            return false;
-        }
+        return !claims.getBody().getExpiration().before(new Date());
     }
 
     public Authentication getAuthentication(String token) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(parse(token));
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 
 
@@ -135,6 +131,4 @@ public class JwtTokenProvider {
         }
         return claims.get(SecurityConstants.TOKEN_CLAIM_KEY_USER_ID, String.class);
     }
-
-
 }

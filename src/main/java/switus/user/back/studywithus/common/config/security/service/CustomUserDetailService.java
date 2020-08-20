@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 import switus.user.back.studywithus.common.config.security.dto.CustomUserDetails;
 import switus.user.back.studywithus.service.UserService;
 
+/**
+ * 인증 시 사용할 Custom User Service
+ */
 @Component
 @RequiredArgsConstructor
 public class CustomUserDetailService implements UserDetailsService {

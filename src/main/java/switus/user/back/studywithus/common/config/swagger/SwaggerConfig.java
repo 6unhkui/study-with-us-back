@@ -22,14 +22,6 @@ public class SwaggerConfig {
 
     @Bean
     public Docket api() {
-        // 에러 리스트
-        List<ResponseMessage> resMsg = Arrays.asList(
-                new ResponseMessageBuilder().code(401).message("No permission").responseModel(new ModelRef("Error")).build(),
-                new ResponseMessageBuilder().code(400).message("Bad Request").responseModel(new ModelRef("Error")).build(),
-                new ResponseMessageBuilder().code(404).message("URL does not exist").responseModel(new ModelRef("Error")).build(),
-                new ResponseMessageBuilder().code(500).message("Server Error").responseModel(new ModelRef("Error")).build()
-        );
-
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(swaggerInfo())
                 .select()
@@ -37,10 +29,6 @@ public class SwaggerConfig {
                 .paths(PathSelectors.ant("/api/**")) // 그중 /api/** 인 URL들만 필터링
                 .build()
                 .useDefaultResponseMessages(false);
-//                .globalResponseMessage(RequestMethod.GET, resMsg)
-//                .globalResponseMessage(RequestMethod.POST, resMsg)
-//                .globalResponseMessage(RequestMethod.PUT, resMsg)
-//                .globalResponseMessage(RequestMethod.DELETE, resMsg);
     }
 
     private ApiInfo swaggerInfo() {

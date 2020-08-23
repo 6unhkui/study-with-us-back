@@ -11,12 +11,14 @@ import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
 public class RoomBoard extends BaseEntity {
-
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long idx;
 
+    @Column(length = 500, nullable = false)
     private String title;
+
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     @ManyToOne(fetch = LAZY)
@@ -26,5 +28,6 @@ public class RoomBoard extends BaseEntity {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(referencedColumnName = "idx")
     private Room room;
+
 }
 

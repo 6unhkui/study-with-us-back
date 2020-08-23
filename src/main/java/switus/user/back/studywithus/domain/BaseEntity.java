@@ -1,6 +1,7 @@
 package switus.user.back.studywithus.domain;
 
 import lombok.Data;
+import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
@@ -11,7 +12,7 @@ import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
 
-@Data
+@Getter
 @MappedSuperclass
 public class BaseEntity extends DateAudit {
     @Column(columnDefinition = "TIMESTAMP")

@@ -22,13 +22,11 @@ spring:
       useServerPrepStmts: true
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
 #        show_sql: true
         format_sql: true
-    profiles:
-      include: oauth
 
 logging:
   level:
@@ -40,3 +38,9 @@ default:
     path: /Users/inkyung/@Development/@Workspace/studywithus.back
   log:
     path: ${default.dir.path}/logs
+
+
+---
+spring:
+  profiles:
+    include: oauth

@@ -3,6 +3,7 @@ package switus.user.back.studywithus.domain.room;
 import lombok.Getter;
 import switus.user.back.studywithus.domain.BaseEntity;
 import switus.user.back.studywithus.domain.category.Category;
+import switus.user.back.studywithus.domain.member.RoomMember;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public class Room extends BaseEntity {
     private String description;
 
     @OneToMany(mappedBy = "room")
-    private List<UserRoom> userRooms = new ArrayList<>();
+    private List<RoomMember> roomMembers = new ArrayList<>();
 
     @ManyToMany(mappedBy = "rooms")
     private List<Category> categories = new ArrayList<>();

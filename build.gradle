@@ -1,7 +1,7 @@
 //querydsl 추가
-buildscript {
-	dependencies { classpath("gradle.plugin.com.ewerk.gradle.plugins:querydsl-plugin:1.0.10") }
-}
+//buildscript {
+//	dependencies { classpath("gradle.plugin.com.ewerk.gradle.plugins:querydsl-plugin:1.0.10") }
+//}
 
 plugins {
 	id 'org.springframework.boot' version '2.3.3.RELEASE'
@@ -9,7 +9,7 @@ plugins {
 	id 'java'
 }
 
-apply plugin: "com.ewerk.gradle.plugins.querydsl"
+//apply plugin: "com.ewerk.gradle.plugins.querydsl"
 
 group = 'switus.user.back'
 version = '0.0.1-SNAPSHOT'
@@ -20,10 +20,10 @@ configurations {
 		extendsFrom annotationProcessor
 	}
 
-	developmentOnly
-	runtimeClasspath {
-		extendsFrom developmentOnly
-	}
+//	developmentOnly
+//	runtimeClasspath {
+//		extendsFrom developmentOnly
+//	}
 }
 
 repositories {
@@ -33,42 +33,49 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'com.querydsl:querydsl-jpa'
-	implementation 'com.querydsl:querydsl-apt'
-	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.5.6'
+	implementation 'org.springframework.boot:spring-boot-starter-security' // Spring Security
+	implementation 'io.jsonwebtoken:jjwt:0.9.1' // JWT
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client' // 소셜 로그인 등 클라이언트 입장에서 소셜 기능 구현 시 필요한 의존성
+	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.5.6'  // SQL 로그에 파라미터에 전달되는 값 확인 *운영 단계에서는 사용 고려*
+	implementation 'io.springfox:springfox-swagger2:2.6.1' // Swagger API Document
+	implementation 'io.springfox:springfox-swagger-ui:2.6.1' // Swagger API Document
+	implementation 'net.rakugakibox.util:yaml-resource-bundle:1.1' // yaml 파일을 사용하여 다국어 처리를 하기위한 라이브러리
+	implementation 'org.springframework.boot:spring-boot-starter-validation:2.3.1.RELEASE' // 필드 Validation 체크
+//	implementation 'com.querydsl:querydsl-jpa' // QueryDSL
+//	implementation 'com.querydsl:querydsl-apt' // QueryDSL
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'mysql:mysql-connector-java'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	annotationProcessor 'org.projectlombok:lombok'
-	implementation 'junit:junit:4.12'
-	testImplementation('org.springframework.boot:spring-boot-starter-test') {
-		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-	}
+	testImplementation('org.springframework.boot:spring-boot-starter-test')
+	testImplementation('org.springframework.security:spring-security-test')
 }
 
 test {
-	useJUnitPlatform()
+	useJUnitPlatform {
+		includeEngines 'junit-vintage'
+	}
 }
 
 //querydsl 추가
 //def querydslDir = 'src/main/generated'
-def querydslDir = "$buildDir/generated/querydsl"
-querydsl {
-	library = "com.querydsl:querydsl-apt"
-	jpa = true
-	querydslSourcesDir = querydslDir
-}
-
-sourceSets {
-	main {
-		java {
-			srcDirs = ['src/main/java', querydslDir]
-		} }
-}
-
-compileQuerydsl{
-	options.annotationProcessorPath = configurations.querydsl
-}
-configurations {
-	querydsl.extendsFrom compileClasspath
-}
+//def querydslDir = "$buildDir/generated/querydsl"
+//querydsl {
+//	library = "com.querydsl:querydsl-apt"
+//	jpa = true
+//	querydslSourcesDir = querydslDir
+//}
+//
+//sourceSets {
+//	main {
+//		java {
+//			srcDirs = ['src/main/java', querydslDir]
+//		} }
+//}
+//
+//compileQuerydsl{
+//	options.annotationProcessorPath = configurations.querydsl
+//}
+//configurations {
+//	querydsl.extendsFrom compileClasspath
+//}

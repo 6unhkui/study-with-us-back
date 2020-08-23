@@ -1,6 +1,8 @@
-spring:
-  jwt:
-    secretKey : helloSwitus
+app:
+  auth:
+    tokenSecret: inkyung123
+  oauth2:
+    authorizedRedirectUri: 'http://localhost:3000/login/oauth2/redirect' # 생성된 토큰을 응답 받을 uri
 
 ---
 # Goggle
@@ -10,8 +12,8 @@ spring:
       client:
         registration:
           google:
-            client-id : 761754848533-bdmp7u9iscoj5a67rogo5rhrnu7cubjg.apps.googleusercontent.com
-            client-secret : rIyc5F4Gjmvw-wzcAEqj9zrv
+            client-id : 681087809037-atqqoqkc35qggljgs6fibpnh8l9rbr4g.apps.googleusercontent.com
+            client-secret : hGgqfA-ehsFaf1f6lnlJ8TAM
             scope : profile, email
 
 ---
@@ -22,8 +24,8 @@ spring:
       client:
         registration:
           naver:
-            client-id: aLiZWBmRXU5a01g8pmfy
-            client-secret: RvfNklq128
+            client-id: 1GOKsRRVZa7oM47VPrI4
+            client-secret: mk5fAfem6t
             scope: name,email,profile_image
             redirect_uri: '{baseUrl}/{action}/oauth2/code/{registrationId}'
             authorization_grant_type: authorization_code

@@ -1,5 +1,8 @@
-package switus.user.back.studywithus.common.config.security.constant;
+package switus.user.back.studywithus.common.security.constant;
 
+/**
+ * Security에서 사용하는 상수 값을 넣어두는 클래스
+ */
 public final class SecurityConstants {
     // JWT token defaults
     public static final String TOKEN_HEADER = "Authorization";

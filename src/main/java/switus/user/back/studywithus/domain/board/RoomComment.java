@@ -17,7 +17,9 @@ public class RoomComment extends BaseEntity {
     private Long idx;
 
     private int depth;
-    private int order;
+    private int seq;
+
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     @ManyToOne(fetch = LAZY)

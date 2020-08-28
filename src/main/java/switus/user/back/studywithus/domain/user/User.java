@@ -32,7 +32,7 @@ public class User extends BaseEntity {
     @Column(length = 50)
     private String phoneNo;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "Blob")
     private String profileImg;
 
     @Enumerated(EnumType.STRING)
@@ -59,6 +59,10 @@ public class User extends BaseEntity {
         this.profileImg = profileImg;
 
         return this;
+    }
+
+    public void setProfileImg(String profileImg) {
+        this.profileImg = profileImg;
     }
 
     @OneToMany(mappedBy = "user")

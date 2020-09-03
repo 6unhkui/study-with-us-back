@@ -15,10 +15,8 @@ import switus.user.back.studywithus.common.util.MultilingualMessageUtils;
 import switus.user.back.studywithus.domain.user.AuthProvider;
 import switus.user.back.studywithus.domain.user.User;
 import switus.user.back.studywithus.domain.user.UserRole;
-import switus.user.back.studywithus.payload.AccessToken;
-import switus.user.back.studywithus.payload.user.UserLoginRequest;
-import switus.user.back.studywithus.payload.user.UserSaveRequest;
-import switus.user.back.studywithus.payload.user.UserLoginResponse;
+import switus.user.back.studywithus.dto.AccessToken;
+import switus.user.back.studywithus.dto.UserDto;
 import switus.user.back.studywithus.service.UserService;
 
 import java.util.Optional;
@@ -36,7 +34,7 @@ public class AuthApiController {
 
     @ApiOperation(value = "로그인", notes = "이메일과 비밀번호를 통해 로그인을 진행합니다. 인증이 성공하면 토큰을 발급합니다.")
     @PostMapping("login")
-    public ResponseEntity<?> login(@RequestBody UserLoginRequest request) {
+    public ResponseEntity<?> login(@RequestBody UserDto.LoginRequest request) {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
         // 이메일과 일치하는 회원 데이터를 찾는다.
@@ -49,12 +47,12 @@ public class AuthApiController {
 
         // 비밀번호가 일치하면 토큰을 발급한다.
         if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            UserLoginResponse response = UserLoginResponse.builder()
-                                        .email(user.getEmail()).name(user.getName()).profileImg(user.getProfileImg())
-                                        .accessToken(
-                                                AccessToken.builder().accessToken(jwtTokenProvider.generate(user.getEmail(), user.getRole()))
-                                                        .expiration(SecurityConstants.TOKEN_VALID_MILISECOND / 1000).build())
-                                        .build();
+            UserDto.LoginResponse response = UserDto.LoginResponse.builder()
+                                                .email(user.getEmail()).name(user.getName()).profileImg(user.getProfileImg())
+                                                .accessToken(
+                                                        AccessToken.builder().accessToken(jwtTokenProvider.generate(user.getEmail(), user.getRole()))
+                                                                .expiration(SecurityConstants.TOKEN_VALID_MILISECOND / 1000).build())
+                                                .build();
 
             return ResponseEntity.ok(response);
         }
@@ -64,7 +62,7 @@ public class AuthApiController {
 
     @ApiOperation(value = "회원 가입", notes = "회원가입을 진행합니다.")
     @PostMapping("register")
-    public ResponseEntity<Long> register(@RequestBody UserSaveRequest request) {
+    public ResponseEntity<Long> register(@RequestBody UserDto.SaveRequest request) {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         request.setPassword(passwordEncoder.encode(request.getPassword()));
         request.setRole(UserRole.USER);
@@ -81,6 +79,4 @@ public class AuthApiController {
             return ResponseEntity.ok(false);
         else return ResponseEntity.ok(true);
     }
-
-
 }

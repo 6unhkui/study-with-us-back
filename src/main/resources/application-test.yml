@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url : jdbc:h2:tcp://localhost/~/switus
+    username : sa
+    password :
+    driver-class-name: org.h2.Driver
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true # SQL을 보기 좋게 출력시켜줌
+        dialect : org.hibernate.dialect.MySQL5InnoDBDialect # 쿼리 로그를 MySQL 버전으로 보기위해 설정
+
+---
+# Test OAuth
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id : test
+            client-secret : test
+            scope : profile, email
+

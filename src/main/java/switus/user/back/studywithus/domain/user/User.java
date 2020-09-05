@@ -3,24 +3,26 @@ package switus.user.back.studywithus.domain.user;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import switus.user.back.studywithus.domain.BaseEntity;
+import org.hibernate.annotations.Where;
+import switus.user.back.studywithus.domain.common.BaseEntity;
 import switus.user.back.studywithus.domain.member.RoomMember;
-import switus.user.back.studywithus.domain.room.Room;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static lombok.AccessLevel.PROTECTED;
+
 @Entity
-@NoArgsConstructor @Getter
+@NoArgsConstructor(access = PROTECTED)
+@Getter
+@Where(clause = "del_Flag = false")
 public class User extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idx;
 
-    @Column(length = 100, unique = true)
+    @Column(length = 100, nullable = false)
     private String email;
 
     @Column(length = 100)
@@ -43,6 +45,11 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private AuthProvider provider = AuthProvider.LOCAL;
 
+
+    @OneToMany(mappedBy = "user")
+    private List<RoomMember> roomMembers = new ArrayList<>();
+
+
     @Builder
     public User(String email, String password, String name, String phoneNo, String profileImg, UserRole role, AuthProvider provider) {
         this.email = email;
@@ -54,31 +61,14 @@ public class User extends BaseEntity {
         this.provider = provider;
     }
 
-    public User update(String name, String profileImg){
-        this.name = name;
+    public void changeName(String name){ this.name = name; }
+
+    public void changePassword(String password){
+        this.password = password;
+    }
+
+    public void changeProfileImg(String profileImg){
         this.profileImg = profileImg;
-
-        return this;
     }
 
-    public void setProfileImg(String profileImg) {
-        this.profileImg = profileImg;
-    }
-
-    @OneToMany(mappedBy = "user")
-    private List<RoomMember> roomMembers = new ArrayList<>();
-
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "idx=" + idx +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", name='" + name + '\'' +
-                ", phoneNo='" + phoneNo + '\'' +
-                ", profileImg='" + profileImg + '\'' +
-                ", role=" + role +
-                '}';
-    }
 }

@@ -1,0 +1,5 @@
+userNotFound : "User does not exist."
+wrongPassword : "Wrong password."
+socialAccount : "This is a social login account."
+userExists : "User already exists."
+profileImageUploadError : "An error occurred while uploading the profile image."

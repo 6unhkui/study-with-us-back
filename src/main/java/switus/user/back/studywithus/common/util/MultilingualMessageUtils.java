@@ -14,4 +14,10 @@ public class MultilingualMessageUtils {
     public String makeMultilingualMessage(String message, Object[] args) {
         return messageSource.getMessage(message, args, LocaleContextHolder.getLocale());
     }
+
+    public String makeMultilingualMessage(String message) {
+        return messageSource.getMessage(message, null, LocaleContextHolder.getLocale());
+    }
+
+
 }

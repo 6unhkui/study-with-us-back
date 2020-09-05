@@ -67,12 +67,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         String token = jwtTokenProvider.generate(authentication);
 
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-
         return UriComponentsBuilder.fromUriString(targetUrl)
-                .queryParam("token", token)
-                .queryParam("userName", userDetails.getName()).encode(StandardCharsets.UTF_8)
-                .build().toUriString();
+                                   .queryParam("token", token)
+                                   .build().toUriString();
     }
 
     protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {

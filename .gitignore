@@ -35,3 +35,5 @@ out/
 
 logs/
 src/main/resources/application-oauth.yml
+
+enerated

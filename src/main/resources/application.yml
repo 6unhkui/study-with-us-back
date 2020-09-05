@@ -22,17 +22,27 @@ spring:
       useServerPrepStmts: true
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
 #        show_sql: true
         format_sql: true
+  servlet:
+    multipart: # Multipart properties
+      max-file-size: 200MB
+      max-request-size: 215MB
+      enabled: true
+  messages :
+    basename : i18n/exception
+    encoding : UTF-8
 
+---
+# Log
 logging:
   level:
     org.hibernate.SQL : debug
 
-# Log
+# Log file
 default:
   dir:
     path: /Users/inkyung/@Development/@Workspace/studywithus.back

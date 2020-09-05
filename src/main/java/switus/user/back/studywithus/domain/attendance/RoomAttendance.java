@@ -1,6 +1,6 @@
 package switus.user.back.studywithus.domain.attendance;
 
-import switus.user.back.studywithus.domain.BaseEntity;
+import switus.user.back.studywithus.domain.common.BaseEntity;
 import switus.user.back.studywithus.domain.room.Room;
 import switus.user.back.studywithus.domain.user.User;
 

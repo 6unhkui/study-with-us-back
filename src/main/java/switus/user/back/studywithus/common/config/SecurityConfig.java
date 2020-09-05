@@ -27,12 +27,13 @@ import switus.user.back.studywithus.domain.user.UserRole;
 @RequiredArgsConstructor
 @EnableWebSecurity // spring security 설정들을 활성화
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
+    // JWT
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomUserDetailService userDetailsService;
     private final CustomAuthenticationEntryPointHandler customAuthenticationEntryPointHandler;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
+    // OAuth2
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;

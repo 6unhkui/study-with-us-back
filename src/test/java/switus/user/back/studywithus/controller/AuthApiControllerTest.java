@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import org.springframework.test.context.ActiveProfiles;
@@ -49,7 +50,9 @@ public class AuthApiControllerTest {
 
         //then
         result.andDo(print())
-              .andExpect(status().isOk());
+              .andExpect(status().isOk())
+              .andExpect(jsonPath("$.status").value(HttpStatus.OK.getReasonPhrase()))
+              .andExpect(jsonPath("$.success").value(true));
     }
 
 
@@ -69,8 +72,10 @@ public class AuthApiControllerTest {
         //then
         result.andDo(print())
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.getReasonPhrase()))
+                .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.accessToken").exists())
-                .andExpect(jsonPath("$.name").value("tester"))
+                .andExpect(jsonPath("$.name").exists())
                 .andExpect(jsonPath("$.email").value(email));
     }
 
@@ -86,7 +91,9 @@ public class AuthApiControllerTest {
         //then
         result.andDo(print())
               .andExpect(status().isOk())
-              .andExpect(content().string(String.valueOf(false)));
+               .andExpect(jsonPath("$.status").value(HttpStatus.OK.getReasonPhrase()))
+               .andExpect(jsonPath("$.success").value(true))
+               .andExpect(jsonPath("$.data").value(false));
     }
 
 
@@ -101,6 +108,8 @@ public class AuthApiControllerTest {
         //then
         result.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().string(String.valueOf(true)));
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.getReasonPhrase()))
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data").value(true));
     }
 }

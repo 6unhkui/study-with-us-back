@@ -21,22 +21,25 @@ import java.util.Map;
 @Getter @Setter
 public class CustomUserDetails implements UserDetails, OAuth2User {
 
+    private Long idx;
     private String name;
     private String email;
     private String password;
     private String profileImg;
     private UserRole role;
 
-    // OAuth2 Provider
+    // OAuth2
     private String nameAttributeKey;  // OAuth2 로그인 진행 시 키가 되는 필드 값. Primary Key와 같은 의미임
     private Map<String, Object> attributes; // Provider가 제공하는 유저의 정보 값
     private AuthProvider provider;
 
     public static CustomUserDetails create(User user) {
         return CustomUserDetails.builder()
+                                .idx(user.getIdx())
                                 .name(user.getName())
                                 .email(user.getEmail())
                                 .profileImg(user.getProfileImg())
+                                .provider(user.getProvider())
                                 .role(user.getRole()).build();
     }
 
@@ -48,10 +51,11 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
 
     @Builder
     public CustomUserDetails(Map<String, Object> attributes, String nameAttributeKey, AuthProvider provider,
-                             String name, String email, String profileImg, UserRole role) {
+                             Long idx, String name, String email, String profileImg, UserRole role) {
         this.attributes = attributes;
         this.nameAttributeKey = nameAttributeKey;
         this.provider = provider;
+        this.idx = idx;
         this.name = name;
         this.email = email;
         this.profileImg = profileImg;
@@ -136,6 +140,7 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
                 .attributes(attributes)
                 .nameAttributeKey(userNameAttributeName)
                 .provider(AuthProvider.GOOGLE)
+                .role(UserRole.USER)
                 .build();
     }
 
@@ -150,6 +155,7 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
                 .attributes(response)
                 .nameAttributeKey(userNameAttributeName)
                 .provider(AuthProvider.NAVER)
+                .role(UserRole.USER)
                 .build();
     }
 }

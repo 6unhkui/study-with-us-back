@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
-import switus.user.back.studywithus.common.error.RestRequestError;
+import switus.user.back.studywithus.common.error.ErrorResponse;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +21,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        RestRequestError error = new RestRequestError(HttpStatus.FORBIDDEN, "Authentication error (cause: forbidden)", accessDeniedException);
+        ErrorResponse error = new ErrorResponse(HttpStatus.FORBIDDEN, "Authentication error (cause: forbidden)", accessDeniedException);
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType("application/json;charset=utf-8");
         response.getWriter().write(om.writeValueAsString(error));

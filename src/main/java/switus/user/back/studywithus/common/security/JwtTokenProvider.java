@@ -11,7 +11,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import switus.user.back.studywithus.common.security.constant.SecurityConstants;
-import switus.user.back.studywithus.common.security.CustomUserDetails;
 import switus.user.back.studywithus.common.error.exception.CommonRuntimeException;
 import switus.user.back.studywithus.common.error.exception.InternalServerException;
 import switus.user.back.studywithus.common.error.exception.InvalidTokenException;
@@ -83,7 +82,6 @@ public class JwtTokenProvider {
                 .setExpiration(new Date(now.getTime() + SecurityConstants.TOKEN_VALID_MILISECOND)) // 토큰 만료 일자
                 .compact();
     }
-
 
 
     /**

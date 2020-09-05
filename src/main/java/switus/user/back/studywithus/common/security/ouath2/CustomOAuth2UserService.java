@@ -10,9 +10,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import switus.user.back.studywithus.common.security.CustomUserDetails;
 import switus.user.back.studywithus.domain.user.User;
-import switus.user.back.studywithus.domain.user.UserRepository;
-
-import javax.servlet.http.HttpSession;
+import switus.user.back.studywithus.repository.UserRepository;
 
 @RequiredArgsConstructor
 @Service
@@ -20,7 +18,6 @@ import javax.servlet.http.HttpSession;
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     private final UserRepository userRepository;
-    private final HttpSession httpSession;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -37,16 +34,19 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         // OAuth2UserService를 통해 가져온 OAuth2User의 attribute를 CustomUserDetails에 담는다.
         CustomUserDetails userDetails = CustomUserDetails.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
 
-        User user = saveOrUpdate(userDetails);
+        saveOrUpdate(userDetails);
 
-        return CustomUserDetails.create(user, oAuth2User.getAttributes());
+        return userDetails;
     }
 
     private User saveOrUpdate(CustomUserDetails customUserDetails) {
-        // 이메일과 일치하는 사용자를 검색하고, 존재한다면 사용자의 이름이나 프로필 사진이 변경될 때를 대비해 update 시켜줌
+//        // 이메일과 일치하는 사용자를 검색하고, 존재한다면 사용자의 이름이나 프로필 사진이 변경될 때를 대비해 update 시켜줌
+//        User user = userRepository.findByEmail(customUserDetails.getEmail())
+//                                   .map(entity -> entity.update(customUserDetails.getName(), customUserDetails.getProfileImg()))
+//                                   .orElse(customUserDetails.toEntity());
+
         User user = userRepository.findByEmail(customUserDetails.getEmail())
-                                   .map(entity -> entity.update(customUserDetails.getName(), customUserDetails.getProfileImg()))
-                                   .orElse(customUserDetails.toEntity());
+                                  .orElse(customUserDetails.toEntity());
         return userRepository.save(user);
     }
 }

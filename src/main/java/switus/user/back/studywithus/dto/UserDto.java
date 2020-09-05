@@ -4,13 +4,20 @@ import lombok.*;
 import switus.user.back.studywithus.domain.user.AuthProvider;
 import switus.user.back.studywithus.domain.user.User;
 import switus.user.back.studywithus.domain.user.UserRole;
+import switus.user.back.studywithus.dto.common.AccessToken;
+
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
 public class UserDto {
 
     @Getter
     @AllArgsConstructor
     public static class LoginRequest {
+        @NotEmpty
         private String email;
+        @NotEmpty
         private String password;
     }
 
@@ -35,46 +42,45 @@ public class UserDto {
     }
 
 
-    @Getter @Setter
-    @Builder
+    @Data @Builder
     public static class SaveRequest {
+        @NotEmpty @Size(max = 100) @Email
         private String email;
+        @NotEmpty @Size(max = 100)
         private String password;
+        @NotEmpty @Size(max = 50)
         private String name;
-        private UserRole role;
-        private AuthProvider provider;
 
         public User toEntity(){
-            return User.builder().email(email).password(password).name(name).role(role).provider(provider).build();
+            return User.builder().email(email).password(password).name(name).role(UserRole.USER).provider(AuthProvider.LOCAL).build();
         }
     }
 
 
-    @Getter
-    @NoArgsConstructor
+    @Data
     public static class UpdateRequest {
         private String name;
     }
 
 
-    @Getter @Setter
-    @NoArgsConstructor
+    @Data
     public static class PasswordChangeRequest {
+        @NotEmpty
         private String oldPassword;
+        @NotEmpty @Size(max = 100)
         private String newPassword;
     }
 
 
-    @Getter
-    @NoArgsConstructor
-    public static class Response {
+    @Data
+    public static class InfoResponse {
         private String name;
         private String profileImg;
         private String email;
         private UserRole role;
         private AuthProvider provider;
 
-        public Response(User user){
+        public InfoResponse(User user){
             this.name = user.getName();
             this.email = user.getEmail();
             this.profileImg = user.getProfileImg();

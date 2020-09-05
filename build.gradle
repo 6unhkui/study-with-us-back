@@ -1,7 +1,15 @@
 //querydsl 추가
-//buildscript {
-//	dependencies { classpath("gradle.plugin.com.ewerk.gradle.plugins:querydsl-plugin:1.0.10") }
-//}
+buildscript {
+	ext {
+		querydslPluginVersion = '1.0.10' // 플러그인 버전
+	}
+	repositories {
+		maven { url "https://plugins.gradle.org/m2/" } // 플러그인 저장소
+	}
+	dependencies {
+		classpath("gradle.plugin.com.ewerk.gradle.plugins:querydsl-plugin:${querydslPluginVersion}") // querydsl 플러그인 의존성 등록
+	}
+}
 
 plugins {
 	id 'org.springframework.boot' version '2.3.3.RELEASE'
@@ -42,8 +50,8 @@ dependencies {
 	implementation 'io.springfox:springfox-swagger-ui:2.6.1' // Swagger API Document
 	implementation 'net.rakugakibox.util:yaml-resource-bundle:1.1' // yaml 파일을 사용하여 다국어 처리를 하기위한 라이브러리
 	implementation 'org.springframework.boot:spring-boot-starter-validation:2.3.1.RELEASE' // 필드 Validation 체크
-//	implementation 'com.querydsl:querydsl-jpa' // QueryDSL
-//	implementation 'com.querydsl:querydsl-apt' // QueryDSL
+	implementation 'com.querydsl:querydsl-jpa' // QueryDSL
+	implementation 'com.querydsl:querydsl-apt' // QueryDSL
 	implementation 'org.imgscalr:imgscalr-lib:4.2' // Image Resize & Crop Library
 	implementation 'commons-io:commons-io:2.6' // File I/O Utility
 	compileOnly 'org.projectlombok:lombok'
@@ -63,25 +71,24 @@ test {
 	}
 }
 
-//querydsl 추가
-//def querydslDir = 'src/main/generated'
-//def querydslDir = "$buildDir/generated/querydsl"
-//querydsl {
-//	library = "com.querydsl:querydsl-apt"
-//	jpa = true
-//	querydslSourcesDir = querydslDir
-//}
-//
-//sourceSets {
-//	main {
-//		java {
-//			srcDirs = ['src/main/java', querydslDir]
-//		} }
-//}
-//
-//compileQuerydsl{
-//	options.annotationProcessorPath = configurations.querydsl
-//}
-//configurations {
-//	querydsl.extendsFrom compileClasspath
-//}
+// querydsl 적용
+apply plugin: "com.ewerk.gradle.plugins.querydsl" // Plugin 적용
+def querydslSrcDir = 'src/main/generated' // QClass 생성 위치
+
+querydsl {
+	library = "com.querydsl:querydsl-apt"
+	jpa = true
+	querydslSourcesDir = querydslSrcDir
+}
+
+sourceSets {
+	main.java.srcDir querydslSrcDir
+}
+
+compileQuerydsl{
+	options.annotationProcessorPath = configurations.querydsl
+}
+
+configurations {
+	querydsl.extendsFrom compileClasspath
+}

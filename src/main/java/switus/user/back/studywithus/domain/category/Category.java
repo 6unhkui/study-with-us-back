@@ -1,7 +1,7 @@
 package switus.user.back.studywithus.domain.category;
 
 import lombok.Getter;
-import switus.user.back.studywithus.domain.BaseEntity;
+import switus.user.back.studywithus.domain.common.BaseEntity;
 import switus.user.back.studywithus.domain.room.Room;
 
 import javax.persistence.*;

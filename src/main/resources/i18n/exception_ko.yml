@@ -1,0 +1,5 @@
+userNotFound : "존재하지 않는 유저입니다."
+wrongPassword : "잘못된 비밀번호입니다."
+socialAccount : "소셜 로그인 계정입니다."
+userExists : "이미 존재하는 유저입니다."
+profileImageUploadError : "프로필 이미지 업로드 중에 에러가 발생하였습니다."

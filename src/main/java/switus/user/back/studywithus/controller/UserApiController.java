@@ -3,14 +3,15 @@ package switus.user.back.studywithus.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import springfox.documentation.annotations.ApiIgnore;
 import switus.user.back.studywithus.common.error.exception.InternalServerException;
 import switus.user.back.studywithus.common.security.CustomUserDetails;
-import switus.user.back.studywithus.domain.user.User;
+import switus.user.back.studywithus.common.util.MultilingualMessageUtils;
+import switus.user.back.studywithus.dto.common.CurrentUser;
 import switus.user.back.studywithus.dto.UserDto;
+import switus.user.back.studywithus.dto.common.CommonResponse;
 import switus.user.back.studywithus.service.UserService;
 
 import java.io.IOException;
@@ -22,47 +23,50 @@ import java.io.IOException;
 public class UserApiController {
 
     private final UserService userService;
+    private final MultilingualMessageUtils message;
 
     @ApiOperation(value = "유저 정보 조회", notes = "유저의 정보를 조회합니다.")
     @GetMapping("/user")
-    public ResponseEntity<UserDto.Response> user(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        User user = userService.findByIdx(userDetails.getIdx());
-
-        return ResponseEntity.ok(new UserDto.Response(user));
-    }
-
-    @ApiOperation(value = "프로필 이미지 등록", notes = "유저의 프로필 이미지를 등록합니다.")
-    @PostMapping("/user/profile")
-    public ResponseEntity<String> uploadProfileImg(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                   @RequestParam("file") MultipartFile file) {
-        try {
-            return ResponseEntity.ok(userService.uploadProfileImg(userDetails.getIdx(), file));
-        }catch (IOException e){
-           throw new InternalServerException("프로필 이미지 등록 중 에러가 발생했습니다.");
-        }
+    public CommonResponse<UserDto.InfoResponse> user(@ApiIgnore @CurrentUser CustomUserDetails userDetails) {
+        return CommonResponse.success(new UserDto.InfoResponse(userService.findByIdx(userDetails.getIdx())));
     }
 
 
     @ApiOperation(value = "유저 정보 수정", notes = "유저의 정보를 수정합니다.")
     @PutMapping("/user")
-    public void update(@AuthenticationPrincipal CustomUserDetails userDetails,
-                       @RequestBody UserDto.UpdateRequest request) {
+    public CommonResponse update(@ApiIgnore @CurrentUser CustomUserDetails userDetails,
+                                 @RequestBody UserDto.UpdateRequest request) {
         userService.update(userDetails.getIdx(), request);
+        return CommonResponse.success();
+    }
+
+
+    @ApiOperation(value = "프로필 이미지 등록", notes = "프로필 이미지를 리사이징 후 base64로 인코딩하여 저장하고, 그 문자열을 반환합니다.")
+    @PostMapping("/user/profile")
+    public CommonResponse<String> uploadProfileImg(@ApiIgnore @CurrentUser CustomUserDetails userDetails,
+                                                   @RequestParam("file") MultipartFile file) {
+        try {
+            return CommonResponse.success(userService.uploadProfileImg(userDetails.getIdx(), file));
+        }catch (IOException e){
+            throw new InternalServerException(message.makeMultilingualMessage("profileImageUploadError"));
+        }
     }
 
 
     @ApiOperation(value = "비밀번호 변경", notes = "유저의 비밀번호를 변경합니다.")
     @PutMapping("/user/password")
-    public void updatePassword(@AuthenticationPrincipal CustomUserDetails userDetails,
-                               @RequestBody UserDto.PasswordChangeRequest request) {
+    public CommonResponse updatePassword(@ApiIgnore @CurrentUser CustomUserDetails userDetails,
+                                         @RequestBody UserDto.PasswordChangeRequest request) {
         userService.updatePassword(userDetails.getIdx(), request);
+        return CommonResponse.success();
     }
 
 
     @ApiOperation(value = "유저 탈퇴", notes = "유저 탈퇴를 진행합니다.")
     @DeleteMapping("/user")
-    public void delete(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public CommonResponse delete(@ApiIgnore @CurrentUser CustomUserDetails userDetails) {
         userService.deleteUser(userDetails.getIdx());
+        return CommonResponse.success();
     }
 
 }

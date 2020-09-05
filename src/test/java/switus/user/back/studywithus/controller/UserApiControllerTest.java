@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
@@ -17,7 +18,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.WebApplicationContext;
 import switus.user.back.studywithus.common.security.JwtTokenProvider;
 import switus.user.back.studywithus.domain.user.UserRole;
 import switus.user.back.studywithus.dto.UserDto;
@@ -49,13 +49,10 @@ public class UserApiControllerTest {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
-    @Autowired
-    private WebApplicationContext context;
-
 
     @Before
     public void createToken() {
-        token = jwtTokenProvider.generate(this.email, UserRole.USER);
+        token = "Bearer " + jwtTokenProvider.generate(this.email, UserRole.USER);
     }
 
 
@@ -65,13 +62,15 @@ public class UserApiControllerTest {
 
         //when
         ResultActions result = mockMvc.perform(get("/api/v1/user")
-                                               .header("Authorization", "Bearer " + token));
+                                               .header("Authorization", token));
 
         //then
         result.andDo(print())
               .andExpect(status().isOk())
-              .andExpect(jsonPath("$.email").value(this.email))
-              .andExpect(jsonPath("$.name").value("tester"));
+              .andExpect(jsonPath("$.status").value(HttpStatus.OK.getReasonPhrase()))
+              .andExpect(jsonPath("$.success").value(true))
+              .andExpect(jsonPath("$.data.email").value(this.email))
+              .andExpect(jsonPath("$.data.name").value("tester"));
     }
 
 
@@ -86,11 +85,14 @@ public class UserApiControllerTest {
 
         //when
         ResultActions result = mockMvc.perform(multipart("/api/v1/user/profile")
-                                      .file(multipartFile).header("Authorization", "Bearer " + token));
+                                      .file(multipartFile).header("Authorization", token));
 
         //then
         result.andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.getReasonPhrase()))
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data").exists());
     }
 
 
@@ -102,13 +104,15 @@ public class UserApiControllerTest {
 
         //when
         ResultActions result = mockMvc.perform(put("/api/v1/user")
-                                        .header("Authorization", "Bearer " + token)
+                                        .header("Authorization", token)
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .content(om.writeValueAsString(request)));
 
         //then
         result.andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.getReasonPhrase()))
+                .andExpect(jsonPath("$.success").value(true));
     }
 
 
@@ -121,13 +125,15 @@ public class UserApiControllerTest {
 
         //when
         ResultActions result = mockMvc.perform(put("/api/v1/user/password")
-                                        .header("Authorization", "Bearer " + token)
+                                        .header("Authorization", token)
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .content(om.writeValueAsString(request)));
 
         //then
         result.andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.getReasonPhrase()))
+                .andExpect(jsonPath("$.success").value(true));
     }
 
 
@@ -137,12 +143,13 @@ public class UserApiControllerTest {
 
         //when
         ResultActions result = mockMvc.perform(delete("/api/v1/user")
-                                      .header("Authorization", "Bearer " + token));
+                                      .header("Authorization", token));
 
         //then
         result.andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.getReasonPhrase()))
+                .andExpect(jsonPath("$.success").value(true));
     }
-
 
 }

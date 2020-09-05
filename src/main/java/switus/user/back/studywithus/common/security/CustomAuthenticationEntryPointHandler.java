@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
-import switus.user.back.studywithus.common.error.RestRequestError;
+import switus.user.back.studywithus.common.error.ErrorResponse;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +21,7 @@ public class CustomAuthenticationEntryPointHandler implements AuthenticationEntr
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        RestRequestError error = new RestRequestError(HttpStatus.UNAUTHORIZED, "Access denied", authException);
+        ErrorResponse error = new ErrorResponse(HttpStatus.UNAUTHORIZED, "Access denied", authException);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json;charset=utf-8");
         response.getWriter().write(om.writeValueAsString(error));

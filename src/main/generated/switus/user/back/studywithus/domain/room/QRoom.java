@@ -37,6 +37,8 @@ public class QRoom extends EntityPathBase<Room> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> insDate = _super.insDate;
 
+    public final NumberPath<Integer> maxCount = createNumber("maxCount", Integer.class);
+
     public final StringPath name = createString("name");
 
     public final ListPath<switus.user.back.studywithus.domain.member.RoomMember, switus.user.back.studywithus.domain.member.QRoomMember> roomMembers = this.<switus.user.back.studywithus.domain.member.RoomMember, switus.user.back.studywithus.domain.member.QRoomMember>createList("roomMembers", switus.user.back.studywithus.domain.member.RoomMember.class, switus.user.back.studywithus.domain.member.QRoomMember.class, PathInits.DIRECT2);

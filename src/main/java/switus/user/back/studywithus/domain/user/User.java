@@ -14,9 +14,9 @@ import java.util.List;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity
-@NoArgsConstructor(access = PROTECTED)
 @Getter
 @Where(clause = "del_Flag = false")
+@NoArgsConstructor(access = PROTECTED)
 public class User extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

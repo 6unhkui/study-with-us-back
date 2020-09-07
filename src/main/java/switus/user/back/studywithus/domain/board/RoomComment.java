@@ -1,5 +1,7 @@
 package switus.user.back.studywithus.domain.board;
 
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Where;
 import switus.user.back.studywithus.domain.common.BaseEntity;
 import switus.user.back.studywithus.domain.user.User;
 
@@ -9,8 +11,11 @@ import java.util.List;
 
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
+import static lombok.AccessLevel.PROTECTED;
 
 @Entity
+@Where(clause = "del_Flag = false")
+@NoArgsConstructor(access = PROTECTED)
 public class RoomComment extends BaseEntity {
     @Id
     @GeneratedValue(strategy = IDENTITY)

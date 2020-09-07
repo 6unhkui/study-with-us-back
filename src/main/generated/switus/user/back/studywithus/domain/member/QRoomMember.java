@@ -22,11 +22,25 @@ public class QRoomMember extends EntityPathBase<RoomMember> {
 
     public static final QRoomMember roomMember = new QRoomMember("roomMember");
 
+    public final switus.user.back.studywithus.domain.common.QBaseEntity _super = new switus.user.back.studywithus.domain.common.QBaseEntity(this);
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> delDate = _super.delDate;
+
+    //inherited
+    public final BooleanPath delFlag = _super.delFlag;
+
     public final NumberPath<Long> idx = createNumber("idx", Long.class);
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> insDate = _super.insDate;
 
     public final EnumPath<RoomMemberRole> role = createEnum("role", RoomMemberRole.class);
 
     public final switus.user.back.studywithus.domain.room.QRoom room;
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> updDate = _super.updDate;
 
     public final switus.user.back.studywithus.domain.user.QUser user;
 

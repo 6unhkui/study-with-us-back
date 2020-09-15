@@ -2,6 +2,7 @@ package switus.user.back.studywithus.common.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -10,7 +11,6 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -21,11 +21,12 @@ import switus.user.back.studywithus.common.security.ouath2.CustomOAuth2UserServi
 import switus.user.back.studywithus.common.security.ouath2.HttpCookieOAuth2AuthorizationRequestRepository;
 import switus.user.back.studywithus.common.security.ouath2.OAuth2AuthenticationFailureHandler;
 import switus.user.back.studywithus.common.security.ouath2.OAuth2AuthenticationSuccessHandler;
-import switus.user.back.studywithus.domain.user.UserRole;
+import switus.user.back.studywithus.domain.account.AccountRole;
 
 
 @RequiredArgsConstructor
 @EnableWebSecurity // spring security 설정들을 활성화
+@Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     // JWT
     private final JwtTokenProvider jwtTokenProvider;
@@ -39,12 +40,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
-
-    // 암호화에 사용하는 PasswordEncoder를 Bean으로 등록한다.
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
+    private final PasswordEncoder passwordEncoder;
 
     // Spring Security에서 인증을 담당하는 AuthenticationManager를 Bean에 등록한다.
     @Bean(BeanIds.AUTHENTICATION_MANAGER)
@@ -56,7 +52,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     // 사용자 인증에 사용하기 위해 userDetailsService의 구현체를 보안 설정하고 패스워드 인코더를 등록한다.
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
     }
 
     @Bean
@@ -76,7 +72,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
            .and()
                .authorizeRequests()
                     .antMatchers("/*/*/auth/**").permitAll() // 인증(로그인, 회원가입)은 모두 접근 가능
-                    .antMatchers("/api/v1/admin/**").hasRole(UserRole.ADMIN.name()) // 특정 권한만 접근 가능. Security는 role 앞에 prefix로 "ROLE_"를 붙여 사용한다.
+                    .antMatchers("/resource/**", "/api/v1/rooms", "/api/v1/categories").permitAll()
+                    .antMatchers("/api/v1/admin/**").hasRole(AccountRole.ADMIN.name()) // 특정 권한만 접근 가능. Security는 role 앞에 prefix로 "ROLE_"를 붙여 사용한다.
                     .anyRequest().authenticated()  // 그 외 요청은 인증이 필요하다
            .and()
                .exceptionHandling()

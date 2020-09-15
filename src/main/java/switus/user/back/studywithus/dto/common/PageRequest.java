@@ -1,8 +1,6 @@
 package switus.user.back.studywithus.dto.common;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import lombok.*;
-import lombok.Getter;
 import org.springframework.data.domain.Sort;
 
 @Data

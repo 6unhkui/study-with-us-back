@@ -10,11 +10,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import switus.user.back.studywithus.common.properties.AppAccountProperties;
 import switus.user.back.studywithus.common.security.constant.SecurityConstants;
 import switus.user.back.studywithus.common.error.exception.CommonRuntimeException;
 import switus.user.back.studywithus.common.error.exception.InternalServerException;
 import switus.user.back.studywithus.common.error.exception.InvalidTokenException;
-import switus.user.back.studywithus.domain.user.UserRole;
+import switus.user.back.studywithus.domain.account.AccountRole;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -32,14 +33,17 @@ public class JwtTokenProvider {
     @Autowired
     private CustomUserDetailService userDetailsService;
 
+    @Autowired
+    private AppAccountProperties appProperties;
+
     @Value("${app.auth.tokenSecret}")
     private String secretKey;
 
-    public String getSecretKey() {
-        return secretKey;
-    }
+//    public String getSecretKey() {
+//        return this.secretKey;
+//    }
 
-    @PostConstruct // 객체가 생성된 후 실행시키는 메소드
+    @PostConstruct
     protected void init() {
         // 프로퍼티에 설정한 key값을 Base64 방식으로 인코딩 하고 그 값을 secretKey로 사용한다.
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
@@ -52,7 +56,7 @@ public class JwtTokenProvider {
      * @param role
      * @return token
      */
-    public String generate(String email, UserRole role){
+    public String generate(String email, AccountRole role){
         Date now = new Date();
         return Jwts.builder()
                 .signWith(SignatureAlgorithm.HS256, secretKey) // 암호화 알고리즘, secret값 세팅
@@ -69,14 +73,20 @@ public class JwtTokenProvider {
 
     public String generate(Authentication authentication){
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        System.out.println("=============================================");
+        System.out.println(userDetails.getAccount().getEmail());
+        System.out.println(userDetails.getAccount().getName());
+        System.out.println(userDetails.getUsername());
+        System.out.println("=============================================");
         Date now = new Date();
         return Jwts.builder()
                 .signWith(SignatureAlgorithm.HS256, secretKey) // 암호화 알고리즘, secret값 세팅
                 .setHeaderParam("type", SecurityConstants.TOKEN_TYPE) // 토큰 타입
                 .setIssuer(SecurityConstants.TOKEN_ISSUER) // 토큰 발급자
                 .setAudience(SecurityConstants.TOKEN_AUDIENCE) // 토큰 대상자
-                .setSubject(SecurityConstants.TOKEN_SUBJECT_PREFIX + userDetails.getUsername()) // 토큰 제목
-                .claim(SecurityConstants.TOKEN_CLAIM_KEY_USER_ID, userDetails.getUsername()) // 토큰 데이터 - email
+                .setSubject(SecurityConstants.TOKEN_SUBJECT_PREFIX + userDetails.getAccount().getEmail()) // 토큰 제목
+                .claim(SecurityConstants.TOKEN_CLAIM_KEY_USER_ID, userDetails.getAccount().getEmail()) // 토큰 데이터 - email
 //                .claim(SecurityConstants.TOKEN_CLAIM_KEY_USER_TYPE, role) // 토큰 데이터 - role
                 .setIssuedAt(now) // 토큰 발행 일자
                 .setExpiration(new Date(now.getTime() + SecurityConstants.TOKEN_VALID_MILISECOND)) // 토큰 만료 일자
@@ -169,8 +179,8 @@ public class JwtTokenProvider {
      * @return Authentication
      */
     public Authentication getAuthentication(String token) {
-        // Token을 파싱해서 사용자의 식별자 값을 얻고, 식별자 값을 통해 User 엔티티를 조회한다.
-        // 조회한 User 엔티티를 Spring Security가 사용자 정보를 담아 관리하는 UserDetails 인터페이스 구현체에 넣는다.
+        // Token을 파싱해서 사용자의 식별자 값을 얻고, 식별자 값을 통해 Account 엔티티를 조회한다.
+        // 조회한 Account 엔티티를 Spring Security가 사용자 정보를 담아 관리하는 UserDetails 인터페이스 구현체에 넣는다.
         UserDetails userDetails = userDetailsService.loadUserByUsername(parse(token));
 
         // UsernamePasswordAuthenticationToken(Authentication 인터페이스의 구현체)을 생성한다.

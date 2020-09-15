@@ -1,13 +1,13 @@
 spring:
   datasource:
-    url : jdbc:h2:tcp://localhost/~/switus
+    url : jdbc:h2:mem://localhost/~/switus
     username : sa
     password :
     driver-class-name: org.h2.Driver
   jpa:
     generate-ddl: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         format_sql: true # SQL을 보기 좋게 출력시켜줌
@@ -24,4 +24,4 @@ spring:
             client-id : test
             client-secret : test
             scope : profile, email
-
+#

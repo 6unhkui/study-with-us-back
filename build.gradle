@@ -1,23 +1,10 @@
-//querydsl 추가
-buildscript {
-	ext {
-		querydslPluginVersion = '1.0.10' // 플러그인 버전
-	}
-	repositories {
-		maven { url "https://plugins.gradle.org/m2/" } // 플러그인 저장소
-	}
-	dependencies {
-		classpath("gradle.plugin.com.ewerk.gradle.plugins:querydsl-plugin:${querydslPluginVersion}") // querydsl 플러그인 의존성 등록
-	}
-}
-
 plugins {
 	id 'org.springframework.boot' version '2.3.3.RELEASE'
 	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
 	id 'java'
+	//querydsl 추가
+	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 }
-
-//apply plugin: "com.ewerk.gradle.plugins.querydsl"
 
 group = 'switus.user.back'
 version = '0.0.1-SNAPSHOT'
@@ -27,11 +14,6 @@ configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
-
-//	developmentOnly
-//	runtimeClasspath {
-//		extendsFrom developmentOnly
-//	}
 }
 
 repositories {
@@ -54,6 +36,8 @@ dependencies {
 	implementation 'com.querydsl:querydsl-apt' // QueryDSL
 	implementation 'org.imgscalr:imgscalr-lib:4.2' // Image Resize & Crop Library
 	implementation 'commons-io:commons-io:2.6' // File I/O Utility
+//	implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.0'
+	implementation 'org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.1.0.RELEASE'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'mysql:mysql-connector-java'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
@@ -61,8 +45,9 @@ dependencies {
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
 	testImplementation('org.springframework.security:spring-security-test')
 	testImplementation('com.jayway.jsonpath:json-path:2.0.0') // MockMvc에서 json response 처리를 위한 라이브러리
-	testCompile group: 'com.h2database', name: 'h2', version: '1.4.197'
 	testImplementation 'org.mockito:mockito-core:2.7.22'
+	testImplementation('pl.pragmatists:JUnitParams:1.1.1') // 파라미터를 이용한 테스트
+	testCompile group: 'com.h2database', name: 'h2', version: '1.4.197'
 }
 
 test {
@@ -71,24 +56,20 @@ test {
 	}
 }
 
-// querydsl 적용
-apply plugin: "com.ewerk.gradle.plugins.querydsl" // Plugin 적용
-def querydslSrcDir = 'src/main/generated' // QClass 생성 위치
+
+//querydsl
+def querydslDir = "$buildDir/generated/querydsl"
 
 querydsl {
-	library = "com.querydsl:querydsl-apt"
 	jpa = true
-	querydslSourcesDir = querydslSrcDir
+	querydslSourcesDir = querydslDir
 }
-
 sourceSets {
-	main.java.srcDir querydslSrcDir
+	main.java.srcDir querydslDir
 }
-
-compileQuerydsl{
-	options.annotationProcessorPath = configurations.querydsl
-}
-
 configurations {
 	querydsl.extendsFrom compileClasspath
+}
+compileQuerydsl {
+	options.annotationProcessorPath = configurations.querydsl
 }

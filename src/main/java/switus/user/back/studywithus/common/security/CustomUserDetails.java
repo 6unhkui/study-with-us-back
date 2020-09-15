@@ -7,9 +7,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import switus.user.back.studywithus.domain.user.AuthProvider;
-import switus.user.back.studywithus.domain.user.User;
-import switus.user.back.studywithus.domain.user.UserRole;
+import switus.user.back.studywithus.domain.account.AccountRole;
+import switus.user.back.studywithus.domain.account.AuthProvider;
+import switus.user.back.studywithus.domain.account.Account;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -21,65 +21,41 @@ import java.util.Map;
 @Getter @Setter
 public class CustomUserDetails implements UserDetails, OAuth2User {
 
-    private Long idx;
-    private String name;
-    private String email;
-    private String password;
-    private String profileImg;
-    private UserRole role;
-
+    private Account account;
     // OAuth2
     private String nameAttributeKey;  // OAuth2 로그인 진행 시 키가 되는 필드 값. Primary Key와 같은 의미임
     private Map<String, Object> attributes; // Provider가 제공하는 유저의 정보 값
-    private AuthProvider provider;
 
-    public static CustomUserDetails create(User user) {
-        return CustomUserDetails.builder()
-                                .idx(user.getIdx())
-                                .name(user.getName())
-                                .email(user.getEmail())
-                                .profileImg(user.getProfileImg())
-                                .provider(user.getProvider())
-                                .role(user.getRole()).build();
+
+    public CustomUserDetails(Account account) {
+        this.account = account;
     }
 
-    public static CustomUserDetails create(User user, Map<String, Object> attributes) {
-        CustomUserDetails userDetails = CustomUserDetails.create(user);
-        userDetails.setAttributes(attributes);
-        return userDetails;
+    public Account getAccount() {
+        return account;
     }
+
 
     @Builder
-    public CustomUserDetails(Map<String, Object> attributes, String nameAttributeKey, AuthProvider provider,
-                             Long idx, String name, String email, String profileImg, UserRole role) {
+    public CustomUserDetails(Map<String, Object> attributes, String nameAttributeKey, Account account) {
         this.attributes = attributes;
         this.nameAttributeKey = nameAttributeKey;
-        this.provider = provider;
-        this.idx = idx;
-        this.name = name;
-        this.email = email;
-        this.profileImg = profileImg;
-        this.role = role;
-    }
-
-    // User Entity 생성
-    public User toEntity() {
-        return User.builder().name(name).email(email).profileImg(profileImg).role(UserRole.USER).provider(provider).build();
+        this.account = account;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority(role.getKey()));
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + account.getRole().name()));
     }
 
     @Override
     public String getPassword() {
-        return this.password;
+        return this.account.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return this.email;
+        return this.account.getEmail();
     }
 
     @Override
@@ -104,7 +80,7 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
 
     @Override
     public String getName() {
-        return name;
+        return this.account.getName();
     }
 
     @Override
@@ -117,6 +93,7 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
     }
 
 
+
     /**
      * OAuth2 Provider가 제공하는 유저 정보로 CustomUserDetails 생성하기
      * @param registrationId
@@ -124,7 +101,8 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
      * @param attributes
      * @return
      */
-    public static CustomUserDetails of(String registrationId, String userNameAttributeName,
+    public static CustomUserDetails of(String registrationId,
+                                       String userNameAttributeName,
                                        Map<String, Object> attributes) {
         if("naver".equals(registrationId))
             return ofNaver("id", attributes);
@@ -134,14 +112,15 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
     public static CustomUserDetails ofGoogle(String userNameAttributeName,
                                              Map<String, Object> attributes) {
         return CustomUserDetails.builder()
-                .name((String)attributes.get("name"))
-                .email((String)attributes.get("email"))
-                .profileImg((String)attributes.get("picture"))
-                .attributes(attributes)
-                .nameAttributeKey(userNameAttributeName)
-                .provider(AuthProvider.GOOGLE)
-                .role(UserRole.USER)
-                .build();
+                                .account(Account.builder()
+                                        .name((String)attributes.get("name"))
+                                        .email((String)attributes.get("email"))
+                                        .profileImg((String)attributes.get("picture"))
+                                        .provider(AuthProvider.GOOGLE)
+                                        .role(AccountRole.USER).build())
+                                .attributes(attributes)
+                                .nameAttributeKey(userNameAttributeName)
+                                .build();
     }
 
     public static CustomUserDetails ofNaver(String userNameAttributeName,
@@ -149,13 +128,14 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
         Map<String, Object> response = (Map<String, Object>)attributes.get("response");
 
         return CustomUserDetails.builder()
-                .name((String)response.get("name"))
-                .email((String)response.get("email"))
-                .profileImg((String)response.get("profile_image"))
+                .account(Account.builder()
+                        .name((String)response.get("name"))
+                        .email((String)response.get("email"))
+                        .profileImg((String)response.get("profile_image"))
+                        .provider(AuthProvider.NAVER)
+                        .role(AccountRole.USER).build())
                 .attributes(response)
                 .nameAttributeKey(userNameAttributeName)
-                .provider(AuthProvider.NAVER)
-                .role(UserRole.USER)
                 .build();
     }
 }

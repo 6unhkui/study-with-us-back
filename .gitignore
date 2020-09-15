@@ -35,5 +35,6 @@ out/
 
 logs/
 src/main/resources/application-oauth.yml
+upload_files/
 
 enerated

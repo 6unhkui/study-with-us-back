@@ -6,6 +6,7 @@ server :
 #    context-path : /api
 
 spring:
+  h2.console.enabled: true
   datasource:
     url : jdbc:mysql://localhost:3306/switus
     username : inkyung
@@ -45,12 +46,20 @@ logging:
 # Log file
 default:
   dir:
-    path: /Users/inkyung/@Development/@Workspace/studywithus.back
+    path: /Users/inkyung/@Development/@Workspace/studywithus.back/
   log:
     path: ${default.dir.path}/logs
+
+---
+file:
+  path :
+    default : ${default.dir.path}/upload_files/
+    cover-image : ${file.path.default}/cover_images/
+
+
 
 
 ---
 spring:
   profiles:
-    include: oauth
+    include: auth

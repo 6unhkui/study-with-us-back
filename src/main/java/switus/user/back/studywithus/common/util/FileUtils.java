@@ -1,6 +1,5 @@
 package switus.user.back.studywithus.common.util;
 
-import com.google.common.io.Resources;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -9,9 +8,8 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import switus.user.back.studywithus.common.error.exception.InternalServerException;
 import switus.user.back.studywithus.common.error.exception.InvalidFileAccessException;
-import switus.user.back.studywithus.common.properties.FileUploadProperties;
+import switus.user.back.studywithus.common.properties.FilePathProperties;
 import switus.user.back.studywithus.domain.file.FileInfo;
 
 import javax.annotation.PostConstruct;
@@ -30,11 +28,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class FileUtils {
 
-    private final FileUploadProperties fileUploadProperties;
+    private final FilePathProperties filePathProperties;
 
     @PostConstruct
     public void init(){
-        File coverImagePath = new File(fileUploadProperties.getCoverImagePath());
+        File coverImagePath = new File(filePathProperties.getCoverImage());
         if(!coverImagePath.exists()) {
             try {
                 Path path = Paths.get(coverImagePath.getAbsolutePath()).normalize();
@@ -52,7 +50,7 @@ public class FileUtils {
 
         Long size = file.getSize();
 
-        Path dest = Paths.get(fileUploadProperties.getCoverImagePath()).toAbsolutePath().normalize().resolve(saveName);
+        Path dest = Paths.get(filePathProperties.getCoverImage()).toAbsolutePath().normalize().resolve(saveName);
         Files.copy(file.getInputStream(), dest, StandardCopyOption.REPLACE_EXISTING);
 
         return FileInfo.builder().originName(originName).saveName(saveName).extension(extension).fileSize(size).build();

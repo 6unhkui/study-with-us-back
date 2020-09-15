@@ -8,7 +8,6 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 import switus.user.back.studywithus.common.security.JwtTokenProvider;
-import switus.user.back.studywithus.common.security.CustomUserDetails;
 import switus.user.back.studywithus.common.error.exception.BadRequestException;
 import switus.user.back.studywithus.common.util.CookieUtils;
 
@@ -18,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import static switus.user.back.studywithus.common.security.ouath2.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;

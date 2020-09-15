@@ -6,7 +6,7 @@ import org.hibernate.annotations.Where;
 import switus.user.back.studywithus.domain.common.BaseEntity;
 import switus.user.back.studywithus.domain.member.converter.RoomMemberRoleConverter;
 import switus.user.back.studywithus.domain.room.Room;
-import switus.user.back.studywithus.domain.user.User;
+import switus.user.back.studywithus.domain.account.Account;
 
 import javax.persistence.*;
 
@@ -15,29 +15,28 @@ import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity
-@Getter
 @Where(clause = "del_Flag = false")
-@NoArgsConstructor(access = PROTECTED)
+@Getter @NoArgsConstructor(access = PROTECTED)
 public class RoomMember extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    private Long idx;
+    private Long id;
 
     @Convert(converter = RoomMemberRoleConverter.class)
     private RoomMemberRole role = RoomMemberRole.MATE;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(referencedColumnName = "idx")
-    private User user;
+    @JoinColumn(name = "account_id")
+    private Account account;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(referencedColumnName = "idx")
+    @JoinColumn(name = "room_id")
     private Room room;
 
-    public void setUser(User user) {
-        this.user = user;
-        user.getRoomMembers().add(this);
+    public void setAccount(Account account) {
+        this.account = account;
+        account.getRoomMembers().add(this);
     }
 
     public void setRoom(Room room) {
@@ -49,10 +48,10 @@ public class RoomMember extends BaseEntity {
         this.role = role;
     }
 
-    public static RoomMember join(User user, Room room, RoomMemberRole role) {
+    public static RoomMember join(Account account, Room room, RoomMemberRole role) {
         RoomMember roomMember = new RoomMember();
         roomMember.setRole(role);
-        roomMember.setUser(user);
+        roomMember.setAccount(account);
         roomMember.setRoom(room);
         return roomMember;
     }

@@ -1,5 +1,5 @@
-userNotFound : "User does not exist."
+accountNotFound : "Account does not exist."
 wrongPassword : "Wrong password."
 socialAccount : "This is a social login account."
-userExists : "User already exists."
+accountExists : "Account already exists."
 profileImageUploadError : "An error occurred while uploading the profile image."

@@ -19,7 +19,7 @@ import java.util.Set;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErrorResponse extends CommonResponse<Object> {
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-dd-MM hh:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss")
     private LocalDateTime timestamp = LocalDateTime.now();
     private String debugMessage;
     private List<ErrorDetail> requestErrorDetails;

@@ -5,8 +5,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
-import switus.user.back.studywithus.common.security.CustomUserDetails;
-import switus.user.back.studywithus.service.UserService;
+import switus.user.back.studywithus.common.error.exception.AccountNotFoundException;
+import switus.user.back.studywithus.service.AccountService;
 
 /**
  * 인증 시 사용할 UserDetailsService의 구현체
@@ -15,11 +15,11 @@ import switus.user.back.studywithus.service.UserService;
 @RequiredArgsConstructor
 public class CustomUserDetailService implements UserDetailsService {
 
-    private final UserService userService;
+    private final AccountService accountService;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return CustomUserDetails.create(userService.findByEmail(email).orElseThrow(() ->
-                new UsernameNotFoundException("존재하지 않는 회원입니다. email = " + email)));
+        return new CustomUserDetails(
+                accountService.findByEmail(email).orElseThrow(() -> new AccountNotFoundException("존재하지 않는 회원입니다. email = " + email)));
     }
 }

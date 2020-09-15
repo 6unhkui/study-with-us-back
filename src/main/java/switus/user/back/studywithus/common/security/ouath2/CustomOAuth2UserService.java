@@ -9,15 +9,17 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import switus.user.back.studywithus.common.security.CustomUserDetails;
-import switus.user.back.studywithus.domain.user.User;
-import switus.user.back.studywithus.repository.UserRepository;
+import switus.user.back.studywithus.domain.account.Account;
+import switus.user.back.studywithus.repository.AccountRepository;
+
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 @Slf4j
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
-    private final UserRepository userRepository;
+    private final AccountRepository accountRepository;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -29,24 +31,28 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         // OAuth2 로그인 진행 시 키가 되는 필드 값. Primary Key와 같은 의미임
         String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails()
-                .getUserInfoEndpoint().getUserNameAttributeName();
+                                                   .getUserInfoEndpoint().getUserNameAttributeName();
 
         // OAuth2UserService를 통해 가져온 OAuth2User의 attribute를 CustomUserDetails에 담는다.
         CustomUserDetails userDetails = CustomUserDetails.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
 
-        saveOrUpdate(userDetails);
+        saveAccount(userDetails.getAccount());
 
         return userDetails;
     }
 
-    private User saveOrUpdate(CustomUserDetails customUserDetails) {
-//        // 이메일과 일치하는 사용자를 검색하고, 존재한다면 사용자의 이름이나 프로필 사진이 변경될 때를 대비해 update 시켜줌
-//        User user = userRepository.findByEmail(customUserDetails.getEmail())
-//                                   .map(entity -> entity.update(customUserDetails.getName(), customUserDetails.getProfileImg()))
-//                                   .orElse(customUserDetails.toEntity());
-
-        User user = userRepository.findByEmail(customUserDetails.getEmail())
-                                  .orElse(customUserDetails.toEntity());
-        return userRepository.save(user);
+    private void saveAccount(Account account) {
+        if(!accountRepository.findByEmail(account.getEmail()).isPresent()){
+            accountRepository.save(account);
+        }
     }
+
+
+//    private void saveOrUpdate(CustomUserDetails customUserDetails) {
+////        // 이메일과 일치하는 사용자를 검색하고, 존재한다면 사용자의 이름이나 프로필 사진이 변경될 때를 대비해 update 시켜줌
+////        Account account = accountRepository.findByEmail(customUserDetails.getEmail())
+////                                   .map(entity -> entity.update(customUserDetails.getName(), customUserDetails.getProfileImg()))
+////                                   .orElse(customUserDetails.toEntity());
+//        accountRepository.save(account);
+//    }
 }

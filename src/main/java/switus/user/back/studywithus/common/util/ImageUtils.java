@@ -12,11 +12,11 @@ import java.util.Base64;
 
 @Component
 public class ImageUtils {
+
     private static int THUMBNAIL_W = 100;
     private static int THUMBNAIL_H = 100;
 
-
-    public static String getBase64String(BufferedImage src, String imageType) {
+    public String getBase64String(BufferedImage src, String imageType) {
         StringBuilder encodeString = new StringBuilder();
         try(ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
             ImageIO.write(src, imageType, bos);
@@ -30,7 +30,7 @@ public class ImageUtils {
     }
 
 
-    public static BufferedImage makeThumbnail(BufferedImage src) throws IOException {
+    public BufferedImage makeThumbnail(BufferedImage src) throws IOException {
         BufferedImage dest;
         // 가로와 세로중
         int side = Math.min(src.getHeight(), src.getWidth());

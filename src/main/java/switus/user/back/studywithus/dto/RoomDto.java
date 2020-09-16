@@ -43,7 +43,7 @@ public class RoomDto {
 //        private SearchType searchType;
         private OrderType orderType = OrderType.NAME;
         private String keyword;
-        private long[] categories;
+        private long[] categoriesId;
     }
 
     @Data

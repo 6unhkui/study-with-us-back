@@ -1,23 +1,16 @@
 package switus.user.back.studywithus.domain.member;
 
-import java.util.Arrays;
+import lombok.AllArgsConstructor;
+import switus.user.back.studywithus.domain.common.BaseEnumCode;
 
-public enum RoomMemberRole {
+@AllArgsConstructor
+public enum RoomMemberRole implements BaseEnumCode<Integer> {
     MATE(0), MANAGER(99);
 
-    private final int value;
+    private final Integer value;
 
-    RoomMemberRole(int value) {
-        this.value = value;
-    }
-
-    public static RoomMemberRole findByValue(int value){
-        return Arrays.stream(RoomMemberRole.values())
-                .filter(v -> v.getValue() == value)
-                .findAny().orElse(null);
-    }
-
-    public int getValue() {
-        return this.value;
+    @Override
+    public Integer getValue() {
+        return value;
     }
 }

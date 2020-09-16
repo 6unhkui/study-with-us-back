@@ -2,6 +2,8 @@ package switus.user.back.studywithus.domain.account;
 
 import lombok.*;
 import org.hibernate.annotations.Where;
+import switus.user.back.studywithus.domain.account.converter.AccountRoleConverter;
+import switus.user.back.studywithus.domain.account.converter.AuthProviderConverter;
 import switus.user.back.studywithus.domain.common.BaseEntity;
 import switus.user.back.studywithus.domain.member.RoomMember;
 
@@ -31,12 +33,12 @@ public class Account extends BaseEntity {
     @Column(columnDefinition = "Blob")
     private String profileImg;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Convert(converter = AccountRoleConverter.class)
+    @Column(columnDefinition = "TINYINT not null comment '0 : User / 99 : Admin'")
     private AccountRole role = AccountRole.USER;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Convert(converter = AuthProviderConverter.class)
+    @Column(columnDefinition = "CHAR not null comment 'L : Local / G : Google / N : Naver'")
     private AuthProvider provider = AuthProvider.LOCAL;
 
     @OneToMany(mappedBy = "account")
@@ -62,4 +64,16 @@ public class Account extends BaseEntity {
         this.profileImg = profileImg;
     }
 
+    @Override
+    public String toString() {
+        return "Account{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", name='" + name + '\'' +
+                ", profileImg='" + profileImg + '\'' +
+                ", role=" + role +
+                ", provider=" + provider +
+                '}';
+    }
 }

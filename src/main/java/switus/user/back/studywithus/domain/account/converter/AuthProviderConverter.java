@@ -1,21 +1,14 @@
 package switus.user.back.studywithus.domain.account.converter;
 
 import switus.user.back.studywithus.domain.account.AuthProvider;
+import switus.user.back.studywithus.domain.common.AbstractBaseEnumConverter;
 
-import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 
 @Converter
-public class AuthProviderConverter implements AttributeConverter<AuthProvider, Integer> {
+public class AuthProviderConverter extends AbstractBaseEnumConverter<AuthProvider, Character> {
     @Override
-    public Integer convertToDatabaseColumn(AuthProvider attribute) {
-        if(attribute == null) return null;
-        return attribute.getValue();
-    }
-
-    @Override
-    public AuthProvider convertToEntityAttribute(Integer dbData) {
-        if(dbData == null) return null;
-        return AuthProvider.findByValue(dbData);
+    protected AuthProvider[] getValueList() {
+        return AuthProvider.values();
     }
 }

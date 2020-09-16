@@ -1,24 +1,19 @@
 package switus.user.back.studywithus.domain.account;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import switus.user.back.studywithus.domain.common.BaseEnumCode;
 
-import java.util.Arrays;
+@Getter
+@AllArgsConstructor
+public enum AuthProvider implements BaseEnumCode<Character>{
+    LOCAL('L'), GOOGLE('G'), NAVER('N');
 
-public enum AuthProvider {
-    LOCAL(0), GOOGLE(1), NAVER(2);
+    private final Character value;
 
-    private final int value;
-
-    AuthProvider(int value) {
-        this.value = value;
-    }
-
-    public static AuthProvider findByValue(int value){
-        return Arrays.stream(AuthProvider.values())
-                .filter(v -> v.getValue() == value)
-                .findAny().orElse(null);
-    }
-
-    public int getValue() {
+    @Override
+    public Character getValue() {
         return this.value;
     }
+
 }

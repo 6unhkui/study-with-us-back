@@ -43,6 +43,7 @@ public class AuthApiController {
         Account account = accountService.findByEmail(
                 request.getEmail()).orElseThrow(AccountNotFoundException::new);
 
+        System.out.println(account.toString());
         if(account.getProvider() != AuthProvider.LOCAL){
             throw new BadRequestException(message.makeMultilingualMessage("socialAccount"));
         }

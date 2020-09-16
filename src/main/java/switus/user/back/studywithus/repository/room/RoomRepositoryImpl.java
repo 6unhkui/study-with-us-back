@@ -62,7 +62,7 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
                                                 .leftJoin(room.cover, fileInfo).fetchJoin()
                                                 .where(
                                                         likeKeyword(searchRequest.getKeyword()),
-                                                        inCategories(searchRequest.getCategories())
+                                                        inCategories(searchRequest.getCategoriesId())
                                                 )
                                                 .orderBy(order(searchRequest.getOrderType()))
                                                 .offset(pageable.getOffset())
@@ -91,12 +91,12 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
         return room.name.like( '%' + keyword + '%');
     }
 
-    private BooleanExpression inCategories(long[] categories) {
-        if(categories.length == 0) {
+    private BooleanExpression inCategories(long[] categoriesId) {
+        if(null == categoriesId || categoriesId.length == 0) {
             return null;
         }
 
-        List<Long> list = Arrays.stream(categories).boxed().collect(Collectors.toList());
+        List<Long> list = Arrays.stream(categoriesId).boxed().collect(Collectors.toList());
         return category.id.in(list);
     }
 

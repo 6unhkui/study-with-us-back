@@ -3,7 +3,9 @@ package switus.user.back.studywithus.domain.member;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Where;
+//import switus.user.back.studywithus.domain.account.converter.AuthProviderConverter;
 import switus.user.back.studywithus.domain.common.BaseEntity;
+//import switus.user.back.studywithus.domain.member.converter.RoomMemberRoleConverter;
 import switus.user.back.studywithus.domain.member.converter.RoomMemberRoleConverter;
 import switus.user.back.studywithus.domain.room.Room;
 import switus.user.back.studywithus.domain.account.Account;
@@ -24,6 +26,7 @@ public class RoomMember extends BaseEntity {
     private Long id;
 
     @Convert(converter = RoomMemberRoleConverter.class)
+    @Column(columnDefinition = "TINYINT not null comment '0 : Mate / 99 : Manager'")
     private RoomMemberRole role = RoomMemberRole.MATE;
 
     @ManyToOne(fetch = LAZY)

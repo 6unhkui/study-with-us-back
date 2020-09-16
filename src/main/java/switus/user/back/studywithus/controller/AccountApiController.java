@@ -25,6 +25,7 @@ public class AccountApiController {
     private final AccountService accountService;
     private final MultilingualMessageUtils message;
 
+
     @ApiOperation(value = "유저 정보 조회")
     @GetMapping
     public CommonResponse<AccountDto.DetailResponse> getDetail(@ApiIgnore @CurrentUser Account account) {

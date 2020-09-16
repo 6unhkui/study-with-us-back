@@ -61,8 +61,8 @@ public class AccountService {
 
 
     @Transactional
-    public String uploadProfileImg(Long idx, MultipartFile file) throws IOException {
-        Account account = findById(idx);
+    public String uploadProfileImg(Long id, MultipartFile file) throws IOException {
+        Account account = findById(id);
 
         String filename = file.getOriginalFilename();
         String fileExtension = FilenameUtils.getExtension(filename);
@@ -78,16 +78,16 @@ public class AccountService {
 
 
     @Transactional
-    public void update(Long idx, AccountDto.UpdateRequest request) {
-        Account account = findById(idx);
+    public void update(Long id, AccountDto.UpdateRequest request) {
+        Account account = findById(id);
         account.changeName(request.getName());
     }
 
 
     @Transactional
-    public void updatePassword(Long idx, AccountDto.PasswordChangeRequest request) {
+    public void updatePassword(Long id, AccountDto.PasswordChangeRequest request) {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        Account account = findById(idx);
+        Account account = findById(id);
         if (!passwordEncoder.matches(request.getOldPassword(), account.getPassword())) {
             throw new BadRequestException(message.makeMultilingualMessage("wrongPassword"));
         }else {
@@ -96,8 +96,8 @@ public class AccountService {
     }
 
     @Transactional
-    public void deleteAccount(Long idx) {
-        Account account = findById(idx);
+    public void deleteAccount(Long id) {
+        Account account = findById(id);
         account.delete();
     }
 

@@ -73,12 +73,6 @@ public class JwtTokenProvider {
 
     public String generate(Authentication authentication){
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-
-        System.out.println("=============================================");
-        System.out.println(userDetails.getAccount().getEmail());
-        System.out.println(userDetails.getAccount().getName());
-        System.out.println(userDetails.getUsername());
-        System.out.println("=============================================");
         Date now = new Date();
         return Jwts.builder()
                 .signWith(SignatureAlgorithm.HS256, secretKey) // 암호화 알고리즘, secret값 세팅
@@ -87,7 +81,7 @@ public class JwtTokenProvider {
                 .setAudience(SecurityConstants.TOKEN_AUDIENCE) // 토큰 대상자
                 .setSubject(SecurityConstants.TOKEN_SUBJECT_PREFIX + userDetails.getAccount().getEmail()) // 토큰 제목
                 .claim(SecurityConstants.TOKEN_CLAIM_KEY_USER_ID, userDetails.getAccount().getEmail()) // 토큰 데이터 - email
-//                .claim(SecurityConstants.TOKEN_CLAIM_KEY_USER_TYPE, role) // 토큰 데이터 - role
+                .claim(SecurityConstants.TOKEN_CLAIM_KEY_USER_TYPE, userDetails.getAccount().getRole()) // 토큰 데이터 - role
                 .setIssuedAt(now) // 토큰 발행 일자
                 .setExpiration(new Date(now.getTime() + SecurityConstants.TOKEN_VALID_MILISECOND)) // 토큰 만료 일자
                 .compact();

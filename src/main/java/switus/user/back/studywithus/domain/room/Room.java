@@ -3,8 +3,8 @@ package switus.user.back.studywithus.domain.room;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.hibernate.annotations.Where;
+import switus.user.back.studywithus.domain.post.RoomPost;
 import switus.user.back.studywithus.domain.common.BaseEntity;
 import switus.user.back.studywithus.domain.category.Category;
 import switus.user.back.studywithus.domain.file.FileInfo;
@@ -33,21 +33,24 @@ public class Room extends BaseEntity {
     @Column(nullable = false)
     private int maxCount;
 
-    @OneToMany(mappedBy = "room")
-    private List<RoomMember> roomMembers = new ArrayList<>();
+    @Column(nullable = false)
+    private int joinCount;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(referencedColumnName = "id")
     private Category category;
 
-//    private Long fileIdx;
-//    @OneToOne
-//    @JoinColumns({@JoinColumn(referencedColumnName="idx"), @JoinColumn(referencedColumnName="group_idx")})
-//    private FileInfo cover;
 
     @OneToOne(fetch = LAZY)
     @JoinColumns({@JoinColumn(referencedColumnName = "id")})
     private FileInfo cover;
+
+
+    @OneToMany(mappedBy = "room")
+    private List<RoomMember> roomMembers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "room")
+    private List<RoomPost> roomPosts = new ArrayList<>();
 
 
     @Builder
@@ -57,18 +60,21 @@ public class Room extends BaseEntity {
         this.maxCount = maxCount;
     }
 
-    public void addCategory(Category category) {
-        this.category = category;
-        category.getRooms().add(this);
-    }
-
     public void setCover(FileInfo file) {
         this.cover = file;
     }
 
+    public void setCategory(Category category) {
+        this.category = category;
+        category.getRooms().add(this);
+    }
 
-    public void addRoomMember(RoomMember roomMember) {
-        roomMember.setRoom(this);
-        roomMembers.add(roomMember);
+
+    public void incrementJoinCount() {
+        joinCount = ++joinCount;
+    }
+
+    public void decrementJoinCount() {
+        joinCount = --joinCount;
     }
 }

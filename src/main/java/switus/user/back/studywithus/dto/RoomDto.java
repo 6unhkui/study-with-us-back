@@ -8,14 +8,16 @@ import switus.user.back.studywithus.domain.member.RoomMemberRole;
 import switus.user.back.studywithus.domain.room.Room;
 
 import javax.validation.constraints.NotNull;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
 public class RoomDto {
 
-    @Getter @Setter
-    @NoArgsConstructor
+    @Data
     public static class SaveRequest {
         @NotNull
         private String name;
@@ -30,21 +32,17 @@ public class RoomDto {
         }
     }
 
-    @Getter @Setter
+    @Data
     public static class SearchRequest {
-//        public enum SearchType {
-//            ALL, NAME;
-//        }
-
         public enum OrderType {
-            NAME, INS_DATE, MEMBER_COUNT;
+            NAME, CREATE_DATE, JOIN_COUNT
         }
 
-//        private SearchType searchType;
         private OrderType orderType = OrderType.NAME;
         private String keyword;
         private long[] categoriesId;
     }
+
 
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -54,25 +52,24 @@ public class RoomDto {
         private String description;
         private int maxCount;
         private int joinCount;
-
         private String category;
         private String coverImage;
 
-        private AccountDto.Response manager;
+        private RoomMemberDto.Response manager;
 
-        public Response(Room room, RoomMember manager, long joinCount){
+        public Response(Room room, RoomMember manager){
             this.id = room.getId();
             this.name = room.getName();
             this.description = room.getDescription();
             this.maxCount = room.getMaxCount();
             this.category = room.getCategory().getName();
-            this.joinCount = (int) joinCount;
+            this.joinCount = room.getJoinCount();
 
             if(null != room.getCover())
                 this.coverImage = room.getCover().getSaveName();
 
             if(null != manager){
-                this.manager = new AccountDto.Response(manager.getAccount());
+                this.manager = new RoomMemberDto.Response(manager);
             }
         }
     }
@@ -94,23 +91,24 @@ public class RoomDto {
         private String category;
         private String coverImage;
 
-        private AccountDto.Response manager;
+        private RoomMemberDto.Response manager;
 
-        private CurrentUser currentUser = new CurrentUser();
+        private currentAccount currentAccount = new currentAccount();
 
         @Getter @Setter
-        private class CurrentUser {
+        private class currentAccount {
             private boolean isMember = false;
             private RoomMemberRole role;
 
-            public CurrentUser() {}
+            public currentAccount() {}
         }
 
-        public DetailResponse(Room room, RoomMember currentUserStatusByRoom){
+        public DetailResponse(Room room, RoomMember manager, RoomMember currentAccountMembership){
             this.id = room.getId();
             this.name = room.getName();
             this.description = room.getDescription();
             this.createDate = room.getInsDate();
+            this.joinCount = room.getJoinCount();
             this.category = room.getCategory().getName();
 
             if(room.getMaxCount() != 0) {
@@ -122,21 +120,15 @@ public class RoomDto {
                 this.coverImage = room.getCover().getSaveName();
             }
 
-            if(null != currentUserStatusByRoom){
-                currentUser.setMember(true);
-                currentUser.setRole(currentUserStatusByRoom.getRole());
+            if(null != currentAccountMembership){
+                this.currentAccount.setMember(true);
+                this.currentAccount.setRole(currentAccountMembership.getRole());
             }
 
-            if(null != room.getRoomMembers()){
-                manager = new AccountDto.Response(room.getRoomMembers().stream().filter(v -> v.getRole().equals(RoomMemberRole.MANAGER)).collect(Collectors.toList()).get(0).getAccount());
-                joinCount = room.getRoomMembers().size();
+            if(null != manager){
+                this.manager = new RoomMemberDto.Response(manager);
             }
         }
-    }
-
-    @Data
-    public static class joinRequest {
-        private Long roomId;
     }
 
 }

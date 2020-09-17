@@ -1,8 +1,8 @@
 app:
   auth:
-    tokenSecret: inkyung123
+    token-secret: inkyung123
   oauth2:
-    authorizedRedirectUri: 'http://localhost:3000/login/oauth2/redirect' # 생성된 토큰을 응답 받을 uri
+    authorized-redirect-uri: 'http://localhost:3000/login/oauth2/redirect' # 생성된 토큰을 응답 받을 프론트 uri
   account:
     admin:
       email: admin@gmail.com
@@ -10,6 +10,7 @@ app:
     user:
       email: user@gmail.com
       password: user
+
 
 ---
 # Goggle

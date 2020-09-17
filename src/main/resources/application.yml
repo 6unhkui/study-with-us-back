@@ -2,8 +2,6 @@ server :
   protocol : http
   url : 127.0.0.1
   port : 8080
-#  servlet :
-#    context-path : /api
 
 spring:
   h2.console.enabled: true
@@ -23,7 +21,7 @@ spring:
       useServerPrepStmts: true
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
 #        show_sql: true

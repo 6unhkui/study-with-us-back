@@ -30,33 +30,18 @@ public class RoomService {
 
     private final RoomRepository roomRepository;
     private final RoomMemberRepository roomMemberRepository;
-    private final CategoryRepository categoryRepository;
+    private final CategoryService categoryService;
 
     private final AccountService accountService;
     private final FileService fileService;
 
-    @PostConstruct
-    public void init() {
-        List<Category> categories = categoryRepository.findAll();
-
-        if (categories.size() == 0) {
-            categories = new ArrayList<>();
-            categories.add(Category.builder().name("외국어").build());
-            categories.add(Category.builder().name("수능").build());
-            categories.add(Category.builder().name("공무원").build());
-            categories.add(Category.builder().name("취업").build());
-            categories.add(Category.builder().name("자격증").build());
-            categories.add(Category.builder().name("개발").build());
-            categories.add(Category.builder().name("디자인").build());
-            categories.add(Category.builder().name("기타").build());
-            categories.forEach(categoryRepository::save);
-        }
-    }
 
     @Transactional
-    public Long create(Long userIdx, RoomDto.SaveRequest request, MultipartFile file) {
+    public Long create(Long accountId, RoomDto.SaveRequest request, MultipartFile file) {
         Room room = request.toEntity();
-        if(file != null){
+
+        // 썸네일 파일이 존재하면 파일 업로드를 진행한다.
+        if(null != file){
             FileInfo fileInfo;
             try {
                 fileInfo = fileService.upload(file);
@@ -66,53 +51,37 @@ public class RoomService {
             }
         }
 
-        categoryRepository.findById(request.getCategoryId()).ifPresent(room::addCategory);
+        // category id를 조회하고 존재하면 room entity에 category entity를 저장한다.
+        Category category = categoryService.findById(request.getCategoryId());
+        room.setCategory(category);
+
+        // 생성한 스터디방을 저장한다.
         roomRepository.save(room);
 
-        Account account = accountService.findById(userIdx);
+        // 스터디 방을 만든 계정을 매니저로 가입시킨다
+        Account account = accountService.findById(accountId);
         RoomMember roomMember = RoomMember.join(account, room, RoomMemberRole.MANAGER);
 
         return roomMemberRepository.save(roomMember).getId();
     }
 
-    @Transactional
-    public void join(Long userIdx, Long roomIdx) {
-        Account account = accountService.findById(userIdx);
-        Room room = findById(roomIdx);
 
-        RoomMember roomMember = RoomMember.join(account, room, RoomMemberRole.MATE);
-        roomMemberRepository.save(roomMember);
-    }
-
-    public Page<RoomDto.Response> findAllWithPagination(RoomDto.SearchRequest searchRequest, Pageable pageable) {
-        return roomRepository.findAllWithPagination(searchRequest, pageable)
-                             .map(room -> new RoomDto.Response(room,
-                                     roomMemberRepository.findManagerByRoomId(room.getId()),
-                                     roomMemberRepository.countByRoomId(room.getId())));
+    public Page<Room> findAll(RoomDto.SearchRequest searchRequest, Pageable pageable) {
+        return roomRepository.findAll(searchRequest, pageable);
     }
 
 
-    public Page<RoomDto.Response> findAllByUserIdWithPagination(Long userIdx, RoomDto.SearchRequest searchRequest, Pageable pageable) {
-        return roomRepository.findAllByUserIdWithPagination(userIdx, searchRequest, pageable)
-                             .map(room -> new RoomDto.Response(room,
-                                            roomMemberRepository.findManagerByRoomId(room.getId()),
-                                            roomMemberRepository.countByRoomId(room.getId())));
+    public Page<Room> findAllByAccountId(Long accountId, RoomDto.SearchRequest searchRequest, Pageable pageable) {
+        return roomRepository.findAllByAccountId(accountId, searchRequest, pageable);
     }
 
-    public Page<RoomDto.Response> findAllByCategoryIdWithPagination(Long categoryIdx, RoomDto.SearchRequest searchRequest, Pageable pageable) {
-        return roomRepository.findAllByCategoryIdWithPagination(categoryIdx, searchRequest, pageable)
-                .map(room -> new RoomDto.Response(room,
-                        roomMemberRepository.findManagerByRoomId(room.getId()),
-                        roomMemberRepository.countByRoomId(room.getId())));
-    }
 
     public Room findById(Long id) {
         return roomRepository.findById(id).orElseThrow(() -> new NoContentException("존재하지 않는 스터디방입니다."));
     }
 
     public Room findDetail(Long roomId) {
-        return roomRepository.findOneById(roomId);
+        return roomRepository.findDetailById(roomId);
     }
-
 
 }

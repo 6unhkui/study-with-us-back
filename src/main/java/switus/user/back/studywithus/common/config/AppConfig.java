@@ -12,9 +12,14 @@ import switus.user.back.studywithus.common.properties.AppAccountProperties;
 import switus.user.back.studywithus.domain.account.Account;
 import switus.user.back.studywithus.domain.account.AccountRole;
 import switus.user.back.studywithus.domain.account.AuthProvider;
+import switus.user.back.studywithus.domain.category.Category;
 import switus.user.back.studywithus.repository.AccountRepository;
+import switus.user.back.studywithus.repository.CategoryRepository;
 
+import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 public class AppConfig {
@@ -33,8 +38,14 @@ public class AppConfig {
             @Autowired
             private AppAccountProperties accountProperties;
 
+            @Autowired
+            private CategoryRepository categoryRepository;
+
             @Override
             public void run(ApplicationArguments args) throws Exception {
+                /**
+                 * 기본 유저 저장 ////////////////////////////////////
+                 */
                 PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
                 Account user = Account.builder().email(accountProperties.getUserEmail())
                                         .name("user").password(passwordEncoder.encode(accountProperties.getUserPassword()))
@@ -51,6 +62,25 @@ public class AppConfig {
                         accountRepository.save(a);
                     }
                 });
+
+
+                /**
+                 * 카테고리 저장 ////////////////////////////////////
+                 */
+                List<Category> categories = categoryRepository.findAll();
+
+                if (categories.size() == 0) {
+                    categories = new ArrayList<>();
+                    categories.add(Category.builder().name("외국어").build());
+                    categories.add(Category.builder().name("수능").build());
+                    categories.add(Category.builder().name("공무원").build());
+                    categories.add(Category.builder().name("취업").build());
+                    categories.add(Category.builder().name("자격증").build());
+                    categories.add(Category.builder().name("개발").build());
+                    categories.add(Category.builder().name("디자인").build());
+                    categories.add(Category.builder().name("기타").build());
+                    categories.forEach(categoryRepository::save);
+                }
             }
         };
     }

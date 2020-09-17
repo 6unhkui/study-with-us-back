@@ -3,6 +3,8 @@ package switus.user.back.studywithus.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import switus.user.back.studywithus.common.error.exception.NoContentException;
+import switus.user.back.studywithus.domain.category.Category;
 import switus.user.back.studywithus.dto.CategoryDto;
 import switus.user.back.studywithus.repository.CategoryRepository;
 
@@ -18,6 +20,10 @@ public class CategoryService {
 
     public List<CategoryDto.CategoryResponse> findAll() {
         return categoryRepository.findAll().stream().map(CategoryDto.CategoryResponse::new).collect(Collectors.toList());
+    }
+
+    public Category findById(Long id) {
+        return categoryRepository.findById(id).orElseThrow(() -> new NoContentException("존재하지 않는 카테고리입니다."));
     }
 
 }

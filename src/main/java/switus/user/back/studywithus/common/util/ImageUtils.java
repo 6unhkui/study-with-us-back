@@ -9,6 +9,8 @@ import java.awt.image.BufferedImageOp;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 public class ImageUtils {
@@ -41,6 +43,18 @@ public class ImageUtils {
         // 리사이징
         dest = Scalr.resize(dest, THUMBNAIL_W, THUMBNAIL_H, (BufferedImageOp) null);
         return dest;
+    }
+
+
+    public static String extractImageFromHtml(String html) {
+        Pattern pattern = Pattern.compile("<img[^>]*src=[\"']?([^>\"']+)[\"']?[^>]*>");
+        Matcher match = pattern.matcher(html);
+        String imgTag = null;
+        if(match.find()) {
+            imgTag = match.group(1);
+        }
+
+        return imgTag;
     }
 
 }

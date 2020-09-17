@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 
+import switus.user.back.studywithus.domain.member.RoomMemberRole;
 import switus.user.back.studywithus.domain.room.Room;
 import switus.user.back.studywithus.dto.RoomDto;
 
@@ -30,34 +31,17 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
 
 
     @Override
-    public Room findOneById(Long roomIdx) {
+    public Room findDetailById(Long roomId) {
         return queryFactory.selectFrom(room)
                            .leftJoin(room.category, category).fetchJoin()
-                           .leftJoin(room.roomMembers, roomMember).fetchJoin()
                            .leftJoin(room.cover, fileInfo).fetchJoin()
-                           .leftJoin(roomMember.account, account).fetchJoin()
-                           .where(room.id.eq(roomIdx))
+                           .where(room.id.eq(roomId))
                            .fetchOne();
     }
 
     @Override
-    public Page<Room> findAllWithPagination(RoomDto.SearchRequest searchRequest, Pageable pageable) {
+    public Page<Room> findAll(RoomDto.SearchRequest searchRequest, Pageable pageable) {
         QueryResults<Room> result = queryFactory.selectFrom(room)
-                                                .leftJoin(room.category, category).fetchJoin()
-                                                .leftJoin(room.cover, fileInfo).fetchJoin()
-                                                .where(likeKeyword(searchRequest.getKeyword()))
-                                                .orderBy(order(searchRequest.getOrderType()))
-                                                .offset(pageable.getOffset())
-                                                .limit(pageable.getPageSize())
-                                                .fetchResults();
-        return new PageImpl<>(result.getResults(), pageable, result.getTotal());
-    }
-
-
-    @Override
-    public Page<Room> findAllByUserIdWithPagination(Long userId, RoomDto.SearchRequest searchRequest, Pageable pageable) {
-        QueryResults<Room> result = queryFactory.selectFrom(room)
-                                                .innerJoin(room.roomMembers, roomMember).on(roomMember.account.id.eq(userId))
                                                 .leftJoin(room.category, category).fetchJoin()
                                                 .leftJoin(room.cover, fileInfo).fetchJoin()
                                                 .where(
@@ -73,11 +57,15 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
 
 
     @Override
-    public Page<Room> findAllByCategoryIdWithPagination(Long categoryIdx, RoomDto.SearchRequest searchRequest, Pageable pageable) {
+    public Page<Room> findAllByAccountId(Long accountId, RoomDto.SearchRequest searchRequest, Pageable pageable) {
         QueryResults<Room> result = queryFactory.selectFrom(room)
-                                                .innerJoin(room.category, category).on(category.id.eq(categoryIdx)).fetchJoin()
+                                                .innerJoin(room.roomMembers, roomMember).on(roomMember.account.id.eq(accountId))
+                                                .leftJoin(room.category, category).fetchJoin()
                                                 .leftJoin(room.cover, fileInfo).fetchJoin()
-                                                .where(likeKeyword(searchRequest.getKeyword()))
+                                                .where(
+                                                        likeKeyword(searchRequest.getKeyword()),
+                                                        inCategories(searchRequest.getCategoriesId())
+                                                )
                                                 .orderBy(order(searchRequest.getOrderType()))
                                                 .offset(pageable.getOffset())
                                                 .limit(pageable.getPageSize())
@@ -85,11 +73,14 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
         return new PageImpl<>(result.getResults(), pageable, result.getTotal());
     }
 
+
+
     private BooleanExpression likeKeyword(String keyword) {
         if(StringUtils.isEmpty(keyword))
             return null;
         return room.name.like( '%' + keyword + '%');
     }
+
 
     private BooleanExpression inCategories(long[] categoriesId) {
         if(null == categoriesId || categoriesId.length == 0) {
@@ -100,11 +91,12 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
         return category.id.in(list);
     }
 
+
     private OrderSpecifier<?> order(RoomDto.SearchRequest.OrderType orderType) {
         switch (orderType) {
-            case INS_DATE:
+            case CREATE_DATE:
                 return room.insDate.desc();
-            case MEMBER_COUNT:
+            case JOIN_COUNT:
                 return room.roomMembers.size().desc();
             default:
                 return room.name.asc();

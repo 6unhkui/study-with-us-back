@@ -17,6 +17,7 @@ public abstract class BaseEntity extends DateAudit {
     private Boolean delFlag = Boolean.FALSE;
 
     public void delete() {
+        this.delDate = LocalDateTime.now();
         this.delFlag = Boolean.TRUE;
     }
 

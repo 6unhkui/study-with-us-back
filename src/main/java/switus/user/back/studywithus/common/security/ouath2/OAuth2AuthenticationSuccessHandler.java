@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
+import switus.user.back.studywithus.common.security.CustomUserDetails;
 import switus.user.back.studywithus.common.security.JwtTokenProvider;
 import switus.user.back.studywithus.common.error.exception.BadRequestException;
 import switus.user.back.studywithus.common.util.CookieUtils;
@@ -29,8 +30,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     private HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
-    @Value("${app.oauth2.authorizedRedirectUri}")
-    private String redirectUri;
+    @Value("${app.oauth2.authorized-redirect-uri}")
+    private String oauth2RedirectUri;
 
 
     @Autowired
@@ -63,7 +64,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
 
-        String token = jwtTokenProvider.generate(authentication);
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        String token = jwtTokenProvider.generate(userDetails.getAccount().getEmail(), userDetails.getAccount().getRole());
 
         return UriComponentsBuilder.fromUriString(targetUrl)
                                    .queryParam("token", token)
@@ -77,7 +79,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     private boolean isAuthorizedRedirectUri(String uri) {
         URI clientRedirectUri = URI.create(uri);
-        URI authorizedURI = URI.create(redirectUri);
+        URI authorizedURI = URI.create(oauth2RedirectUri);
 
         if(authorizedURI.getHost().equalsIgnoreCase(clientRedirectUri.getHost())
                 && authorizedURI.getPort() == clientRedirectUri.getPort()) {

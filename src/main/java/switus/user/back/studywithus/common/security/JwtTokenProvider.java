@@ -36,12 +36,10 @@ public class JwtTokenProvider {
     @Autowired
     private AppAccountProperties appProperties;
 
-    @Value("${app.auth.tokenSecret}")
+
+    @Value("${app.auth.token-secret}")
     private String secretKey;
 
-//    public String getSecretKey() {
-//        return this.secretKey;
-//    }
 
     @PostConstruct
     protected void init() {
@@ -50,12 +48,7 @@ public class JwtTokenProvider {
     }
 
 
-    /**
-     * 토큰 생성
-     * @param email
-     * @param role
-     * @return token
-     */
+    // 토큰 생성
     public String generate(String email, AccountRole role){
         Date now = new Date();
         return Jwts.builder()
@@ -71,29 +64,8 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String generate(Authentication authentication){
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        Date now = new Date();
-        return Jwts.builder()
-                .signWith(SignatureAlgorithm.HS256, secretKey) // 암호화 알고리즘, secret값 세팅
-                .setHeaderParam("type", SecurityConstants.TOKEN_TYPE) // 토큰 타입
-                .setIssuer(SecurityConstants.TOKEN_ISSUER) // 토큰 발급자
-                .setAudience(SecurityConstants.TOKEN_AUDIENCE) // 토큰 대상자
-                .setSubject(SecurityConstants.TOKEN_SUBJECT_PREFIX + userDetails.getAccount().getEmail()) // 토큰 제목
-                .claim(SecurityConstants.TOKEN_CLAIM_KEY_USER_ID, userDetails.getAccount().getEmail()) // 토큰 데이터 - email
-                .claim(SecurityConstants.TOKEN_CLAIM_KEY_USER_TYPE, userDetails.getAccount().getRole()) // 토큰 데이터 - role
-                .setIssuedAt(now) // 토큰 발행 일자
-                .setExpiration(new Date(now.getTime() + SecurityConstants.TOKEN_VALID_MILISECOND)) // 토큰 만료 일자
-                .compact();
-    }
 
-
-    /**
-     * 토큰 유효성 체크
-     * @param token
-     * @return 유효성 체크 결과
-     * @throws SignatureException
-     */
+    // 토큰 유효성 체그
     public boolean validateToken(String token) throws SignatureException {
         Jws<Claims> claims = Jwts.parser()
                     .setSigningKey(secretKey)
@@ -102,11 +74,7 @@ public class JwtTokenProvider {
     }
 
 
-    /**
-     * 토큰 파싱
-     * @param token
-     * @return token의 claim에 넣은 유저 데이터
-     */
+    // 토큰 파싱
     public String parse(String token){
         CommonRuntimeException ex;
 
@@ -154,11 +122,7 @@ public class JwtTokenProvider {
     }
 
 
-    /**
-     * claim에서 데이터 파싱
-     * @param claims
-     * @return claim에 넣은 유저 데이터 중 user id 값(여기서는 이메일을 id로 사용하고 있다)
-     */
+    // claim에서 데이터 파싱
     private String parseUserId(Claims claims){
         if(!claims.containsKey(SecurityConstants.TOKEN_CLAIM_KEY_USER_ID)){
             throw new RequiredTypeException("UserId could not be found in claims");
@@ -167,11 +131,7 @@ public class JwtTokenProvider {
     }
 
 
-    /**
-     * Token을 통해 Authentication 객체 생성
-     * @param token
-     * @return Authentication
-     */
+    // Token을 통해 Authentication 객체 생성
     public Authentication getAuthentication(String token) {
         // Token을 파싱해서 사용자의 식별자 값을 얻고, 식별자 값을 통해 Account 엔티티를 조회한다.
         // 조회한 Account 엔티티를 Spring Security가 사용자 정보를 담아 관리하는 UserDetails 인터페이스 구현체에 넣는다.
@@ -183,11 +143,7 @@ public class JwtTokenProvider {
     }
 
 
-    /**
-     * HttpServletRequest의 Header에서 Token 값을 가져온다.
-     * @param req
-     * @return token
-     */
+    // HttpServletRequest의 Header에서 Token 값을 가져온다.
     public String resolveToken(HttpServletRequest req) {
         return req.getHeader(HttpHeaders.AUTHORIZATION).replace(SecurityConstants.TOKEN_PREFIX,"").trim();
     }

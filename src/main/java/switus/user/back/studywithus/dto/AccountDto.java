@@ -14,7 +14,7 @@ import javax.validation.constraints.Size;
 
 public class AccountDto {
 
-    @Getter
+    @Data
     @AllArgsConstructor
     public static class LoginRequest {
         @NotEmpty
@@ -24,24 +24,13 @@ public class AccountDto {
     }
 
 
-    @Getter
-    @AllArgsConstructor
+    @Data @Builder
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class LoginResponse {
         private String name;
         private String profileImg;
         private String email;
         private String accessToken;
-        private long expiration;
-
-        @Builder
-        public LoginResponse(String name, String profileImg, String email, AccessToken accessToken) {
-            this.email = email;
-            this.profileImg = profileImg;
-            this.name = name;
-            this.accessToken = accessToken.getAccessToken();
-            this.expiration = accessToken.getExpiration();
-        }
     }
 
 
@@ -100,14 +89,6 @@ public class AccountDto {
         private String name;
         private String profileImg;
         private String email;
-        private RoomMemberRole role;
-
-        public Response(Account account, RoomMemberRole role){
-            this.name = account.getName();
-            this.email = account.getEmail();
-            this.profileImg = account.getProfileImg();
-            this.role = role;
-        }
 
         public Response(Account account){
             this.name = account.getName();

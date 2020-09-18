@@ -35,7 +35,7 @@ public class RoomDto {
     @Data
     public static class SearchRequest {
         public enum OrderType {
-            NAME, CREATE_DATE, JOIN_COUNT
+            NAME, CREATED_DATE, JOIN_COUNT
         }
 
         private OrderType orderType = OrderType.NAME;

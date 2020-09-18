@@ -96,9 +96,8 @@ public class AccountService {
     }
 
     @Transactional
-    public void deleteAccount(Long id) {
+    public void delete(Long id) {
         Account account = findById(id);
         account.delete();
     }
-
 }

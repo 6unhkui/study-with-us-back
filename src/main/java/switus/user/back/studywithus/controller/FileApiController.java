@@ -16,7 +16,7 @@ import switus.user.back.studywithus.common.util.FileUtils;
 import javax.activation.MimetypesFileTypeMap;
 import java.io.IOException;
 
-@Api(tags = {"5. File"})
+@Api(tags = {"6. File"})
 @RestController
 @RequestMapping("/resource")
 @RequiredArgsConstructor
@@ -27,7 +27,7 @@ public class FileApiController {
 
     private final MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
 
-    @GetMapping(value = "/room/cover-image/{fileName}")
+    @GetMapping("/room/cover-image/{fileName}")
     public ResponseEntity<InputStreamResource> coverImage(@PathVariable("fileName") String fileName) throws IOException {
         Resource resource = fileUtils.loadAsResource(filePathProperties.getCoverImage(), fileName);
         return ResponseEntity.ok()

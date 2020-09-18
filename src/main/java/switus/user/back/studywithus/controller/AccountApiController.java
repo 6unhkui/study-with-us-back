@@ -3,13 +3,14 @@ package switus.user.back.studywithus.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 import switus.user.back.studywithus.common.error.exception.InternalServerException;
 import switus.user.back.studywithus.common.util.MultilingualMessageUtils;
 import switus.user.back.studywithus.domain.account.Account;
-import switus.user.back.studywithus.dto.common.CurrentUser;
+import switus.user.back.studywithus.common.annotaion.CurrentUser;
 import switus.user.back.studywithus.dto.AccountDto;
 import switus.user.back.studywithus.dto.common.CommonResponse;
 import switus.user.back.studywithus.service.AccountService;
@@ -18,7 +19,7 @@ import java.io.IOException;
 
 @Api(tags = {"2. Account"})
 @RestController
-@RequestMapping(value = "/api/v1/account")
+@RequestMapping(value = "/api/v1/account", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class AccountApiController {
 
@@ -26,14 +27,14 @@ public class AccountApiController {
     private final MultilingualMessageUtils message;
 
 
-    @ApiOperation(value = "유저 정보 조회")
+    @ApiOperation("계정 정보 조회")
     @GetMapping
-    public CommonResponse<AccountDto.DetailResponse> getDetail(@ApiIgnore @CurrentUser Account account) {
+    public CommonResponse<AccountDto.DetailResponse> getAccount(@ApiIgnore @CurrentUser Account account) {
         return CommonResponse.success(new AccountDto.DetailResponse(account));
     }
 
 
-    @ApiOperation(value = "유저 정보 수정")
+    @ApiOperation(value = "계정 정보 수정")
     @PutMapping
     public CommonResponse update(@ApiIgnore @CurrentUser Account account,
                                  @RequestBody AccountDto.UpdateRequest request) {
@@ -65,8 +66,8 @@ public class AccountApiController {
 
     @ApiOperation(value = "계정 탈퇴")
     @DeleteMapping
-    public CommonResponse delete(@ApiIgnore @CurrentUser Account account) {
-        accountService.deleteAccount(account.getId());
+    public CommonResponse withdraw(@ApiIgnore @CurrentUser Account account) {
+        accountService.delete(account.getId());
         return CommonResponse.success();
     }
 

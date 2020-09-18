@@ -14,6 +14,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.header.writers.frameoptions.WhiteListedAllowFromStrategy;
+import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import switus.user.back.studywithus.common.security.*;
 import switus.user.back.studywithus.common.security.filter.CorsFilter;
 import switus.user.back.studywithus.common.security.filter.JwtAuthenticationFilter;
@@ -22,6 +24,8 @@ import switus.user.back.studywithus.common.security.ouath2.HttpCookieOAuth2Autho
 import switus.user.back.studywithus.common.security.ouath2.OAuth2AuthenticationFailureHandler;
 import switus.user.back.studywithus.common.security.ouath2.OAuth2AuthenticationSuccessHandler;
 import switus.user.back.studywithus.domain.account.AccountRole;
+
+import java.util.Arrays;
 
 
 @RequiredArgsConstructor
@@ -67,7 +71,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
        http.httpBasic().disable() // Rest API 이므로, 비인증시 로그인 폼으로 리다이렉트 되는 기본 설정을 사용하지 않는다.
-           .csrf().disable() // Rest API 이므로, csrf 보안이 필요없음
+           .csrf().disable() // Rest API 이므로, Cross Site Request Forgery(CSRF) 보안이 필요없음
            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Session을 사용하지 않음
            .and()
                .authorizeRequests()
@@ -99,9 +103,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
 
-    // 정적 컨텐츠는 Security 대상에서 제외한다.
     @Override
     public void configure(WebSecurity web) throws Exception {
+        // 정적 컨텐츠는 Security 대상에서 제외한다.
         web.ignoring().antMatchers("/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**", "/swagger/**");
     }
 }

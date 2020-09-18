@@ -37,7 +37,7 @@ dependencies {
 	implementation 'org.imgscalr:imgscalr-lib:4.2' // Image Resize & Crop Library
 	implementation 'commons-io:commons-io:2.6' // File I/O Utility
 //	implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.0'
-	implementation 'org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.1.0.RELEASE'
+//	implementation 'org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.1.0.RELEASE'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'mysql:mysql-connector-java'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
@@ -46,7 +46,7 @@ dependencies {
 	testImplementation('org.springframework.security:spring-security-test')
 	testImplementation('com.jayway.jsonpath:json-path:2.0.0') // MockMvc에서 json response 처리를 위한 라이브러리
 	testImplementation 'org.mockito:mockito-core:2.7.22'
-//	testImplementation('pl.pragmatists:JUnitParams:1.1.1') // 파라미터를 이용한 테스트
+	testImplementation('pl.pragmatists:JUnitParams:1.1.1') // 파라미터를 이용한 테스트
 	testCompile group: 'com.h2database', name: 'h2', version: '1.4.197'
 }
 

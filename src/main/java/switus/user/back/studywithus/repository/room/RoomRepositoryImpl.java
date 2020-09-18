@@ -94,7 +94,7 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
 
     private OrderSpecifier<?> order(RoomDto.SearchRequest.OrderType orderType) {
         switch (orderType) {
-            case CREATE_DATE:
+            case CREATED_DATE:
                 return room.insDate.desc();
             case JOIN_COUNT:
                 return room.roomMembers.size().desc();

@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import switus.user.back.studywithus.common.util.FileUtils;
 import switus.user.back.studywithus.domain.file.FileInfo;
+import switus.user.back.studywithus.domain.file.FileType;
 import switus.user.back.studywithus.repository.FileRepository;
 
 import java.io.IOException;
@@ -19,7 +20,7 @@ public class FileService {
     private final FileUtils fileUtils;
 
     @Transactional
-    public FileInfo upload(MultipartFile file) throws IOException {
-        return fileRepository.save(fileUtils.upload(file));
+    public FileInfo upload(FileType fileType, MultipartFile file) throws IOException {
+        return fileRepository.save(fileUtils.upload(fileType, file));
     }
 }

@@ -11,7 +11,7 @@ public interface RoomRepository extends JpaRepository<Room, Long>, RoomRepositor
 //                    "LEFT OUTER JOIN user u ON rm.user_idx = u.idx"
 //            ,
 //            nativeQuery = true)
-//    List<RoomMember> findByRoomIdx(@Param("roomIdx") Long roomIdx);
+//    List<Member> findByRoomIdx(@Param("roomIdx") Long roomIdx);
 
 //    @Modifying
 //    @Query(value = "UPDATE Room r SET r.joinCount = r.joinCount+1 WHERE r.idx=:idx")

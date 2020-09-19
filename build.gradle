@@ -36,6 +36,8 @@ dependencies {
 	implementation 'com.querydsl:querydsl-apt' // QueryDSL
 	implementation 'org.imgscalr:imgscalr-lib:4.2' // Image Resize & Crop Library
 	implementation 'commons-io:commons-io:2.6' // File I/O Utility
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis' // Redis
+	implementation 'org.springframework.boot:spring-boot-starter-mail' // SMTP
 //	implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.0'
 //	implementation 'org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.1.0.RELEASE'
 	compileOnly 'org.projectlombok:lombok'

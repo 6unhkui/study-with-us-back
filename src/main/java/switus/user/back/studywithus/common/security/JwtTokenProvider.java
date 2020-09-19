@@ -77,18 +77,12 @@ public class JwtTokenProvider {
     // 토큰 파싱
     public String parse(String token){
         CommonRuntimeException ex;
-
         try {
             Claims claims = Jwts.parser()
                     .setSigningKey(secretKey)
                     .parseClaimsJws(token)
                     .getBody();
-
-//            CurrentUser currentUser = CurrentUser.builder()
-//                    .id(parseUserId(claims)).build();
-
             return parseUserId(claims);
-
         } catch (SignatureException e){
             log.trace("[Invalid JWT signature]\n {}", e);
             ex = new InvalidTokenException(e.getMessage());
@@ -117,7 +111,6 @@ public class JwtTokenProvider {
             log.trace("[Unexpected exception trace]\n {}", e);
             ex = new InternalServerException(e.getMessage());
         }
-
         throw ex;
     }
 

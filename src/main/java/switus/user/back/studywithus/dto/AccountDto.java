@@ -2,11 +2,10 @@ package switus.user.back.studywithus.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
-import switus.user.back.studywithus.domain.member.RoomMemberRole;
 import switus.user.back.studywithus.domain.account.Account;
 import switus.user.back.studywithus.domain.account.AccountRole;
 import switus.user.back.studywithus.domain.account.AuthProvider;
-import switus.user.back.studywithus.dto.common.AccessToken;
+import switus.user.back.studywithus.domain.member.Member;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;

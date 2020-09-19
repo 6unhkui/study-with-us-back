@@ -10,18 +10,16 @@ import switus.user.back.studywithus.common.error.exception.InternalServerExcepti
 import switus.user.back.studywithus.common.error.exception.NoContentException;
 import switus.user.back.studywithus.domain.category.Category;
 import switus.user.back.studywithus.domain.file.FileInfo;
-import switus.user.back.studywithus.domain.member.RoomMember;
-import switus.user.back.studywithus.domain.member.RoomMemberRole;
+import switus.user.back.studywithus.domain.file.FileType;
+import switus.user.back.studywithus.domain.member.Member;
+import switus.user.back.studywithus.domain.member.MemberRole;
 import switus.user.back.studywithus.domain.room.Room;
 import switus.user.back.studywithus.domain.account.Account;
 import switus.user.back.studywithus.dto.RoomDto;
-import switus.user.back.studywithus.repository.CategoryRepository;
-import switus.user.back.studywithus.repository.member.RoomMemberRepository;
+import switus.user.back.studywithus.repository.member.MemberRepository;
 import switus.user.back.studywithus.repository.room.RoomRepository;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -29,7 +27,7 @@ import java.util.*;
 public class RoomService {
 
     private final RoomRepository roomRepository;
-    private final RoomMemberRepository roomMemberRepository;
+    private final MemberRepository memberRepository;
     private final CategoryService categoryService;
 
     private final AccountService accountService;
@@ -44,7 +42,7 @@ public class RoomService {
         if(null != file){
             FileInfo fileInfo;
             try {
-                fileInfo = fileService.upload(file);
+                fileInfo = fileService.upload(FileType.COVER, file);
                 room.setCover(fileInfo);
             } catch (IOException e) {
                throw new InternalServerException("파일 업로드 중에 에러가 발생했습니다.");
@@ -60,9 +58,9 @@ public class RoomService {
 
         // 스터디 방을 만든 계정을 매니저로 가입시킨다
         Account account = accountService.findById(accountId);
-        RoomMember roomMember = RoomMember.join(account, room, RoomMemberRole.MANAGER);
+        Member member = Member.join(account, room, MemberRole.MANAGER);
 
-        return roomMemberRepository.save(roomMember).getId();
+        return memberRepository.save(member).getId();
     }
 
 

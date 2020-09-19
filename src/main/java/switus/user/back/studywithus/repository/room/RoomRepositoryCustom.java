@@ -2,8 +2,6 @@ package switus.user.back.studywithus.repository.room;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import switus.user.back.studywithus.domain.member.RoomMember;
-import switus.user.back.studywithus.domain.member.RoomMemberRole;
 import switus.user.back.studywithus.domain.room.Room;
 import switus.user.back.studywithus.dto.RoomDto;
 

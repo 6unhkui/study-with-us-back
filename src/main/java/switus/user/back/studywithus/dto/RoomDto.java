@@ -3,16 +3,12 @@ package switus.user.back.studywithus.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
-import switus.user.back.studywithus.domain.member.RoomMember;
-import switus.user.back.studywithus.domain.member.RoomMemberRole;
+import switus.user.back.studywithus.domain.member.Member;
+import switus.user.back.studywithus.domain.member.MemberRole;
 import switus.user.back.studywithus.domain.room.Room;
 
 import javax.validation.constraints.NotNull;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 
 public class RoomDto {
@@ -55,9 +51,9 @@ public class RoomDto {
         private String category;
         private String coverImage;
 
-        private RoomMemberDto.Response manager;
+        private MemberDto.Response manager;
 
-        public Response(Room room, RoomMember manager){
+        public Response(Room room, Member manager){
             this.id = room.getId();
             this.name = room.getName();
             this.description = room.getDescription();
@@ -69,7 +65,7 @@ public class RoomDto {
                 this.coverImage = room.getCover().getSaveName();
 
             if(null != manager){
-                this.manager = new RoomMemberDto.Response(manager);
+                this.manager = new MemberDto.Response(manager);
             }
         }
     }
@@ -91,19 +87,19 @@ public class RoomDto {
         private String category;
         private String coverImage;
 
-        private RoomMemberDto.Response manager;
+        private MemberDto.Response manager;
 
         private currentAccount currentAccount = new currentAccount();
 
         @Getter @Setter
         private class currentAccount {
             private boolean isMember = false;
-            private RoomMemberRole role;
+            private MemberRole role;
 
             public currentAccount() {}
         }
 
-        public DetailResponse(Room room, RoomMember manager, RoomMember currentAccountMembership){
+        public DetailResponse(Room room, Member manager, Member currentAccountMembership){
             this.id = room.getId();
             this.name = room.getName();
             this.description = room.getDescription();
@@ -126,7 +122,7 @@ public class RoomDto {
             }
 
             if(null != manager){
-                this.manager = new RoomMemberDto.Response(manager);
+                this.manager = new MemberDto.Response(manager);
             }
         }
     }

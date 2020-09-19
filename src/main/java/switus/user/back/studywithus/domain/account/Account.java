@@ -5,7 +5,7 @@ import org.hibernate.annotations.Where;
 import switus.user.back.studywithus.domain.account.converter.AccountRoleConverter;
 import switus.user.back.studywithus.domain.account.converter.AuthProviderConverter;
 import switus.user.back.studywithus.domain.common.BaseEntity;
-import switus.user.back.studywithus.domain.member.RoomMember;
+import switus.user.back.studywithus.domain.member.Member;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public class Account extends BaseEntity {
     private AuthProvider provider = AuthProvider.LOCAL;
 
     @OneToMany(mappedBy = "account")
-    private List<RoomMember> roomMembers = new ArrayList<>();
+    private List<Member> members = new ArrayList<>();
 
     @Builder
     public Account(String email, String password, String name, String profileImg, AccountRole role, AuthProvider provider) {

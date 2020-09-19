@@ -10,7 +10,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 
-import switus.user.back.studywithus.domain.member.RoomMemberRole;
 import switus.user.back.studywithus.domain.room.Room;
 import switus.user.back.studywithus.dto.RoomDto;
 
@@ -20,9 +19,8 @@ import java.util.stream.Collectors;
 
 import static switus.user.back.studywithus.domain.category.QCategory.category;
 import static switus.user.back.studywithus.domain.file.QFileInfo.fileInfo;
-import static switus.user.back.studywithus.domain.member.QRoomMember.roomMember;
+import static switus.user.back.studywithus.domain.member.QMember.member;
 import static switus.user.back.studywithus.domain.room.QRoom.room;
-import static switus.user.back.studywithus.domain.account.QAccount.account;
 
 @RequiredArgsConstructor
 public class RoomRepositoryImpl implements RoomRepositoryCustom {
@@ -59,7 +57,7 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
     @Override
     public Page<Room> findAllByAccountId(Long accountId, RoomDto.SearchRequest searchRequest, Pageable pageable) {
         QueryResults<Room> result = queryFactory.selectFrom(room)
-                                                .innerJoin(room.roomMembers, roomMember).on(roomMember.account.id.eq(accountId))
+                                                .innerJoin(room.members, member).on(member.account.id.eq(accountId))
                                                 .leftJoin(room.category, category).fetchJoin()
                                                 .leftJoin(room.cover, fileInfo).fetchJoin()
                                                 .where(
@@ -97,7 +95,7 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
             case CREATED_DATE:
                 return room.insDate.desc();
             case JOIN_COUNT:
-                return room.roomMembers.size().desc();
+                return room.members.size().desc();
             default:
                 return room.name.asc();
         }

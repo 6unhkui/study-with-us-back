@@ -4,11 +4,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Where;
-import switus.user.back.studywithus.domain.post.RoomPost;
+import switus.user.back.studywithus.domain.member.Member;
+import switus.user.back.studywithus.domain.post.Post;
 import switus.user.back.studywithus.domain.common.BaseEntity;
 import switus.user.back.studywithus.domain.category.Category;
 import switus.user.back.studywithus.domain.file.FileInfo;
-import switus.user.back.studywithus.domain.member.RoomMember;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -47,10 +47,7 @@ public class Room extends BaseEntity {
 
 
     @OneToMany(mappedBy = "room")
-    private List<RoomMember> roomMembers = new ArrayList<>();
-
-    @OneToMany(mappedBy = "room")
-    private List<RoomPost> roomPosts = new ArrayList<>();
+    private List<Member> members = new ArrayList<>();
 
 
     @Builder

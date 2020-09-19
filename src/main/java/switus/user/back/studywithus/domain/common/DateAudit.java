@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class DateAudit {
     @CreatedDate
-    @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP NOT NULL")
+    @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL")
     private LocalDateTime insDate;
 
     @LastModifiedDate

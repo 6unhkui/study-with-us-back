@@ -13,15 +13,11 @@ public abstract class BaseEntity extends DateAudit {
     @Column(columnDefinition = "TIMESTAMP")
     private LocalDateTime delDate;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "TINYINT not null DEFAULT 0")
     private Boolean delFlag = Boolean.FALSE;
 
     public void delete() {
         this.delDate = LocalDateTime.now();
         this.delFlag = Boolean.TRUE;
-    }
-
-    public void undelete() {
-        this.delFlag = Boolean.FALSE;
     }
 }

@@ -53,6 +53,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Where;
 import org.springframework.context.annotation.Primary;
 import switus.user.back.studywithus.domain.common.BaseEntity;
+import switus.user.back.studywithus.domain.member.converter.MemberRoleConverter;
 
 import javax.persistence.*;
 
@@ -71,24 +72,33 @@ public class FileInfo extends BaseEntity {
     @Column(name = "group_id")
     private Long groupId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String originName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String saveName;
+
+    @Column(nullable = false, length = 255)
+    private String savePath;
 
     @Column(nullable = false)
     private Long fileSize;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private String extension;
+
+    @Convert(converter = MemberRoleConverter.class)
+    @Column(columnDefinition = "TINYINT not null comment '0 : Cover / 1 : Editor / 2 : Attachment'")
+    private FileType fileType;
 
 
     @Builder
-    public FileInfo(String originName, String saveName, Long fileSize, String extension) {
+    public FileInfo(String originName, String saveName, String savePath, Long fileSize, String extension, FileType fileType) {
         this.originName = originName;
         this.saveName = saveName;
+        this.savePath = savePath;
         this.fileSize = fileSize;
         this.extension = extension;
+        this.fileType = fileType;
     }
 }

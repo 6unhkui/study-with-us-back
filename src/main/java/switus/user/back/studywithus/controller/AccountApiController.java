@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
+import switus.user.back.studywithus.common.error.exception.BadRequestException;
 import switus.user.back.studywithus.common.error.exception.InternalServerException;
 import switus.user.back.studywithus.common.util.MultilingualMessageUtils;
 import switus.user.back.studywithus.domain.account.Account;
@@ -47,6 +48,13 @@ public class AccountApiController {
     @PostMapping("/profile")
     public CommonResponse<String> uploadProfileImg(@ApiIgnore @CurrentUser Account account,
                                                    @RequestParam("file") MultipartFile file) {
+       if(file.isEmpty() || file.getSize() <= 0L) {
+           throw new BadRequestException("MultipartFile size was 0 byte");
+       }
+       if (file.getContentType() != null && !file.getContentType().startsWith("image/")) {
+           throw new BadRequestException("Invalid content-type");
+       }
+
         try {
             return CommonResponse.success(accountService.uploadProfileImg(account.getId(), file));
         }catch (IOException e){

@@ -5,9 +5,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import switus.user.back.studywithus.common.util.ImageUtils;
 import switus.user.back.studywithus.domain.post.Post;
+import switus.user.back.studywithus.domain.post.PostComment;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class PostDto {
 
@@ -37,6 +40,7 @@ public class PostDto {
         private LocalDateTime createdDate;
 
         private MemberDto.Response author;
+        private int commentCount;
 
         public Response(Post post){
             this.id = post.getId();
@@ -45,6 +49,7 @@ public class PostDto {
             this.createdDate = post.getInsDate();
             this.author = new MemberDto.Response(post.getMember());
             this.thumbnail = ImageUtils.extractImageFromHtml(post.getContent());
+            this.commentCount = post.getComments().size();
         }
     }
 

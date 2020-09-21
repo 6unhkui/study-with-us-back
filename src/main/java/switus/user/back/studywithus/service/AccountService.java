@@ -28,9 +28,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AccountService {
 
-    private final AccountRepository accountRepository;
     private final MultilingualMessageUtils message;
     private final ImageUtils imageUtils;
+
+    private final AccountRepository accountRepository;
+    private final FileService fileService;
 
 
     @Transactional
@@ -66,17 +68,9 @@ public class AccountService {
     @Transactional
     public String uploadProfileImg(Long id, MultipartFile file) throws IOException {
         Account account = findById(id);
-
-        String filename = file.getOriginalFilename();
-        String fileExtension = FilenameUtils.getExtension(filename);
-
-        BufferedImage read = ImageIO.read(file.getInputStream());
-        BufferedImage image = imageUtils.makeThumbnail(read);
-
-        String base64String = imageUtils.getBase64String(image, fileExtension);
-        account.changeProfileImg(base64String);
-
-        return base64String;
+        String base64Thumbnail = imageUtils.getBase64Thumbnail(file);
+        account.changeProfileImg(base64Thumbnail);
+        return base64Thumbnail;
     }
 
 

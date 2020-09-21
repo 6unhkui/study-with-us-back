@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CommonResponse<T> {
     private boolean success;
-    private HttpStatus status;
+    private int status;
     private String message;
     private T data;
 
@@ -20,13 +20,13 @@ public class CommonResponse<T> {
 
     public CommonResponse(boolean success, HttpStatus status, String message){
         this.success = success;
-        this.status = status;
+        this.status = status.value();
         this.message = message;
     }
 
     public CommonResponse(boolean success, HttpStatus status){
         this.success = success;
-        this.status = status;
+        this.status = status.value();
     }
 
 

@@ -1,7 +1,9 @@
 package switus.user.back.studywithus.common.util;
 
+import org.apache.commons.io.FilenameUtils;
 import org.imgscalr.Scalr;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -43,6 +45,17 @@ public class ImageUtils {
         // 리사이징
         dest = Scalr.resize(dest, THUMBNAIL_W, THUMBNAIL_H, (BufferedImageOp) null);
         return dest;
+    }
+
+
+    public String getBase64Thumbnail(MultipartFile file) throws IOException {
+        String filename = file.getOriginalFilename();
+        String fileExtension = FilenameUtils.getExtension(filename);
+
+        BufferedImage read = ImageIO.read(file.getInputStream());
+        BufferedImage image = makeThumbnail(read);
+
+        return getBase64String(image, fileExtension);
     }
 
 

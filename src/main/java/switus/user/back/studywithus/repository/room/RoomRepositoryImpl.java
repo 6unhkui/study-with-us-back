@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 
+import switus.user.back.studywithus.domain.file.FileType;
 import switus.user.back.studywithus.domain.room.Room;
 import switus.user.back.studywithus.dto.RoomDto;
 
@@ -29,10 +30,10 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
 
 
     @Override
-    public Room findDetailById(Long roomId) {
+    public Room findDetail(Long roomId) {
         return queryFactory.selectFrom(room)
                            .leftJoin(room.category, category).fetchJoin()
-                           .leftJoin(room.cover, fileInfo).fetchJoin()
+//                           .leftJoin(room.cover, fileInfo).fetchJoin()
                            .where(room.id.eq(roomId))
                            .fetchOne();
     }
@@ -41,7 +42,8 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
     public Page<Room> findAll(RoomDto.SearchRequest searchRequest, Pageable pageable) {
         QueryResults<Room> result = queryFactory.selectFrom(room)
                                                 .leftJoin(room.category, category).fetchJoin()
-                                                .leftJoin(room.cover, fileInfo).fetchJoin()
+//                                                .leftJoin(fileInfo).on(fileInfo.id.eq())
+//                                                .leftJoin(room.cover, fileInfo).fetchJoin()
                                                 .where(
                                                         likeKeyword(searchRequest.getKeyword()),
                                                         inCategories(searchRequest.getCategoriesId())
@@ -55,11 +57,12 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
 
 
     @Override
-    public Page<Room> findAllByAccountId(Long accountId, RoomDto.SearchRequest searchRequest, Pageable pageable) {
+    public Page<Room> findAllByAccount(Long accountId, RoomDto.SearchRequest searchRequest, Pageable pageable) {
         QueryResults<Room> result = queryFactory.selectFrom(room)
                                                 .innerJoin(room.members, member).on(member.account.id.eq(accountId))
                                                 .leftJoin(room.category, category).fetchJoin()
-                                                .leftJoin(room.cover, fileInfo).fetchJoin()
+                                                .leftJoin(fileInfo).on(room.fileId.eq(fileInfo.id))
+//                                                .leftJoin(room.cover, fileInfo).fetchJoin()
                                                 .where(
                                                         likeKeyword(searchRequest.getKeyword()),
                                                         inCategories(searchRequest.getCategoriesId())

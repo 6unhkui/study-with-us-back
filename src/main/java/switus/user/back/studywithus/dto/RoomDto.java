@@ -9,6 +9,7 @@ import switus.user.back.studywithus.domain.room.Room;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 
 public class RoomDto {
@@ -21,6 +22,7 @@ public class RoomDto {
         private boolean unlimited;
         private int maxCount;
         private Long categoryId;
+        private Long fileId;
 
         public Room toEntity(){
             if(unlimited) maxCount = 0;
@@ -61,8 +63,8 @@ public class RoomDto {
             this.category = room.getCategory().getName();
             this.joinCount = room.getJoinCount();
 
-            if(null != room.getCover())
-                this.coverImage = room.getCover().getSaveName();
+//            if(null != room.getCover())
+//                this.coverImage = room.getFileId();
 
             if(null != manager){
                 this.manager = new MemberDto.Response(manager);
@@ -99,7 +101,7 @@ public class RoomDto {
             public currentAccount() {}
         }
 
-        public DetailResponse(Room room, Member manager, Member currentAccountMembership){
+        public DetailResponse(Room room, Member manager, Optional<Member> currentAccountMembership){
             this.id = room.getId();
             this.name = room.getName();
             this.description = room.getDescription();
@@ -112,13 +114,13 @@ public class RoomDto {
                 this.maxCount = room.getMaxCount();
             }
 
-            if(null != room.getCover()) {
-                this.coverImage = room.getCover().getSaveName();
-            }
+//            if(null != room.getCover()) {
+//                this.coverImage = room.getCover().getSaveName();
+//            }
 
-            if(null != currentAccountMembership){
+            if(currentAccountMembership.isPresent()){
                 this.currentAccount.setMember(true);
-                this.currentAccount.setRole(currentAccountMembership.getRole());
+                this.currentAccount.setRole(currentAccountMembership.get().getRole());
             }
 
             if(null != manager){

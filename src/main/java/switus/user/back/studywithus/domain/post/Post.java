@@ -34,7 +34,7 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToMany(mappedBy = "board")
+    @OneToMany(mappedBy = "post")
     private List<PostComment> comments;
 
     @Builder

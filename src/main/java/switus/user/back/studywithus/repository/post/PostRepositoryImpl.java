@@ -11,7 +11,6 @@ import switus.user.back.studywithus.domain.post.Post;
 import static switus.user.back.studywithus.domain.post.QPost.post;
 import static switus.user.back.studywithus.domain.post.QPostComment.postComment;
 
-
 import static switus.user.back.studywithus.domain.member.QMember.member;
 
 @RequiredArgsConstructor
@@ -30,6 +29,4 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                                                 .fetchResults();
         return new PageImpl<>(result.getResults(), pageable, result.getTotal());
     }
-
-
 }

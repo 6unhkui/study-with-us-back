@@ -9,6 +9,7 @@ import java.io.Serializable;
 @Builder
 public class AccessToken implements Serializable {
     private String accessToken;
-    private long expiration;
+    private long expiredAt;
+    private long now;
 }
 

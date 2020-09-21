@@ -76,7 +76,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
            .and()
                .authorizeRequests()
                     .antMatchers("/*/*/auth/**").permitAll() // 인증(로그인, 회원가입)은 모두 접근 가능
-                    .antMatchers("/resource/**", "/api/v1/rooms", "/api/v1/categories").permitAll()
+                    .antMatchers("/api/v1/files/**", "/api/v1/rooms", "/api/v1/categories").permitAll()
                     .antMatchers("/api/v1/admin/**").hasRole(AccountRole.ADMIN.name()) // 특정 권한만 접근 가능. Security는 role 앞에 prefix로 "ROLE_"를 붙여 사용한다.
                     .anyRequest().authenticated()  // 그 외 요청은 인증이 필요하다
            .and()

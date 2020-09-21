@@ -7,6 +7,6 @@ import switus.user.back.studywithus.dto.RoomDto;
 
 public interface RoomRepositoryCustom {
     Page<Room> findAll(RoomDto.SearchRequest searchRequest, Pageable pageable);
-    Page<Room> findAllByAccountId(Long accountIdx, RoomDto.SearchRequest searchRequest, Pageable pageable);
-    Room findDetailById(Long idx);
+    Page<Room> findAllByAccount(Long accountIdx, RoomDto.SearchRequest searchRequest, Pageable pageable);
+    Room findDetail(Long idx);
 }

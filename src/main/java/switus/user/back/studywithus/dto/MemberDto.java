@@ -21,12 +21,14 @@ public class MemberDto {
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Response {
+        private Long id;
         private String name;
         private String profileImg;
         private String email;
         private MemberRole role;
 
         public Response(Member member){
+            this.id = member.getAccount().getId();
             this.name = member.getAccount().getName();
             this.email = member.getAccount().getEmail();
             this.profileImg = member.getAccount().getProfileImg();

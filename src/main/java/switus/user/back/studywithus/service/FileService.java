@@ -1,14 +1,19 @@
 package switus.user.back.studywithus.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import switus.user.back.studywithus.common.util.FileUtils;
+import switus.user.back.studywithus.common.util.ImageUtils;
+import switus.user.back.studywithus.domain.account.Account;
 import switus.user.back.studywithus.domain.file.FileInfo;
 import switus.user.back.studywithus.domain.file.FileType;
 import switus.user.back.studywithus.repository.FileRepository;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 @Service
@@ -18,9 +23,11 @@ public class FileService {
 
     private final FileRepository fileRepository;
     private final FileUtils fileUtils;
+    private final ImageUtils imageUtils;
 
     @Transactional
     public FileInfo upload(FileType fileType, MultipartFile file) throws IOException {
         return fileRepository.save(fileUtils.upload(fileType, file));
     }
+
 }

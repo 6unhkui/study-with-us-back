@@ -1,5 +1,6 @@
 package switus.user.back.studywithus.domain.post;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Where;
 import org.springframework.data.util.Lazy;
@@ -16,7 +17,7 @@ import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
-@Entity
+@Entity @Getter
 @Where(clause = "del_Flag = false")
 @NoArgsConstructor(access = PROTECTED)
 public class PostComment extends BaseEntity {
@@ -33,18 +34,14 @@ public class PostComment extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @ManyToOne(fetch = EAGER)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
 
-    @ManyToOne(fetch = LAZY)
+    @ManyToOne(fetch = EAGER)
     @JoinColumn(name = "parent_id")
     private PostComment parent;
 
     @OneToMany(mappedBy = "parent")
     private List<PostComment> child;
-
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(referencedColumnName = "id")
-    private Post board;
 }

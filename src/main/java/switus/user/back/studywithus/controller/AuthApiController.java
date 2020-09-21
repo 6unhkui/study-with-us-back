@@ -15,6 +15,7 @@ import switus.user.back.studywithus.common.util.MultilingualMessageUtils;
 import switus.user.back.studywithus.domain.account.AuthProvider;
 import switus.user.back.studywithus.domain.account.Account;
 import switus.user.back.studywithus.dto.AccountDto;
+import switus.user.back.studywithus.dto.common.AccessToken;
 import switus.user.back.studywithus.dto.common.CommonResponse;
 import switus.user.back.studywithus.service.AccountService;
 
@@ -33,9 +34,9 @@ public class AuthApiController {
     private final MultilingualMessageUtils message;
 
 
-    @ApiOperation(value = "로그인", notes = "이메일과 비밀번호를 통해 로그인을 진행. 로그인을 성공하면 사용자 기본 정보와 access token 응답")
-    @PostMapping("login")
-    public CommonResponse<AccountDto.LoginResponse> login(@Valid @RequestBody AccountDto.LoginRequest request) {
+    @ApiOperation(value = "토큰 요청", notes = "이메일과 비밀번호를 전달받고 값이 일치하면 access token 응답")
+    @PostMapping("getToken")
+    public CommonResponse<AccessToken> getToken(@Valid @RequestBody AccountDto.LoginRequest request) {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
         // 이메일과 일치하는 회원 데이터를 찾는다.
@@ -48,17 +49,13 @@ public class AuthApiController {
 
         // 비밀번호가 일치하면 토큰을 발급한다.
         if (passwordEncoder.matches(request.getPassword(), account.getPassword())) {
-            AccountDto.LoginResponse response = AccountDto.LoginResponse.builder()
-                                                .email(account.getEmail())
-                                                .name(account.getName())
-                                                .profileImg(account.getProfileImg())
-                                                .accessToken(jwtTokenProvider.generate(account.getEmail(), account.getRole()))
-                                                .build();
-            return CommonResponse.success(response);
+            AccessToken token = AccessToken.builder().accessToken(jwtTokenProvider.generate(account.getEmail(), account.getRole())).build();
+            return CommonResponse.success(token);
         }
 
         throw new UnauthorizedException(message.makeMultilingualMessage("wrongPassword"));
     }
+
 
 
     @ApiOperation(value = "회원 가입")
@@ -69,6 +66,7 @@ public class AuthApiController {
         accountService.save(request);
         return CommonResponse.success();
     }
+
 
 
     @ApiOperation(value = "이메일 중복 체크", notes = "중복 = true, 중복이 아님 = false")

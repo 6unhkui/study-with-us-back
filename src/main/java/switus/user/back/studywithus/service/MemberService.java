@@ -34,7 +34,7 @@ public class MemberService {
     }
 
     public Optional<Member> findMember(Long accountId, Long roomId){
-        return Optional.of(memberRepository.findMembership(accountId, roomId));
+        return Optional.ofNullable(memberRepository.findMembership(accountId, roomId));
     }
 
     public Member findMembership(Long accountId, Long roomId){

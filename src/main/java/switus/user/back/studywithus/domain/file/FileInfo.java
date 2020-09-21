@@ -53,6 +53,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Where;
 import org.springframework.context.annotation.Primary;
 import switus.user.back.studywithus.domain.common.BaseEntity;
+import switus.user.back.studywithus.domain.file.converter.FileTypeConverter;
 import switus.user.back.studywithus.domain.member.converter.MemberRoleConverter;
 
 import javax.persistence.*;
@@ -87,7 +88,7 @@ public class FileInfo extends BaseEntity {
     @Column(nullable = false, length = 50)
     private String extension;
 
-    @Convert(converter = MemberRoleConverter.class)
+    @Convert(converter = FileTypeConverter.class)
     @Column(columnDefinition = "TINYINT not null comment '0 : Cover / 1 : Editor / 2 : Attachment'")
     private FileType fileType;
 

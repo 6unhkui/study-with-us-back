@@ -6,11 +6,14 @@ import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 import switus.user.back.studywithus.domain.account.Account;
 import switus.user.back.studywithus.common.annotaion.CurrentUser;
+import switus.user.back.studywithus.dto.AccountDto;
 import switus.user.back.studywithus.dto.RoomDto;
 import switus.user.back.studywithus.dto.common.CommonResponse;
 import switus.user.back.studywithus.dto.common.PageRequest;
@@ -30,18 +33,16 @@ public class RoomApiController {
 
 
     @ApiOperation("스터디방 만들기")
-    @PostMapping(value = "/room", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping("room")
     public CommonResponse<Long> create(@ApiIgnore @CurrentUser Account account,
-                                       @Valid RoomDto.SaveRequest request,
-                                       @RequestParam(value = "file", required = false) MultipartFile file) throws NotFoundException {
-
-        return CommonResponse.success(roomService.create(account.getId(), request, file));
+                                       @Valid @RequestBody RoomDto.SaveRequest request) throws NotFoundException {
+        System.out.println(request.toString());
+        return CommonResponse.success(roomService.create(account.getId(), request));
     }
 
 
-
     @ApiOperation("스터디방 리스트")
-    @GetMapping("/rooms")
+    @GetMapping("rooms")
     public CommonResponse<Page<RoomDto.Response>> rooms(RoomDto.SearchRequest searchRequest,
                                                         PageRequest pageRequest) throws NotFoundException {
         return CommonResponse.success(
@@ -52,7 +53,7 @@ public class RoomApiController {
 
 
     @ApiOperation("현재 사용자가 가입한 스터디방 리스트")
-    @GetMapping("/user/rooms")
+    @GetMapping("user/rooms")
     public CommonResponse<Page<RoomDto.Response>> roomsByCurrentAccount(@ApiIgnore @CurrentUser Account account,
                                                                         RoomDto.SearchRequest searchRequest,
                                                                         PageRequest pageRequest) throws NotFoundException {
@@ -64,13 +65,13 @@ public class RoomApiController {
 
 
     @ApiOperation("스터디방 상세 보기")
-    @GetMapping("/room/{roomId}")
+    @GetMapping("room/{roomId}")
     public CommonResponse<RoomDto.DetailResponse> room(@ApiIgnore @CurrentUser Account account,
                                                        @PathVariable("roomId") Long roomId) throws NotFoundException {
         return CommonResponse.success(new RoomDto.DetailResponse(
                         roomService.findDetail(roomId),
                         memberService.findManagerByRoomId(roomId),
-                        memberService.findMembership(account.getId(), roomId)));
+                        memberService.findMember(account.getId(), roomId)));
     }
 
 

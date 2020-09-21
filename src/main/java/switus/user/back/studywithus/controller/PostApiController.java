@@ -15,7 +15,7 @@ import switus.user.back.studywithus.service.PostService;
 
 @Api(tags = {"5. Post"})
 @RestController
-@RequestMapping(value = "/api/v1/room", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class PostApiController {
 
@@ -23,7 +23,7 @@ public class PostApiController {
 
 
     @ApiOperation("게시글 작성")
-    @PostMapping("/{roomId}/post")
+    @PostMapping("/room/{roomId}/post")
     public CommonResponse create(@ApiIgnore @CurrentUser Account account,
                                  PostDto.SaveRequest request,
                                  @PathVariable("roomId") Long roomId) {
@@ -31,8 +31,9 @@ public class PostApiController {
         return CommonResponse.success();
     }
 
+
     @ApiOperation("게시글 리스트")
-    @GetMapping("/{roomId}/posts")
+    @GetMapping("/room/{roomId}/posts")
     public CommonResponse posts(@PathVariable("roomId") Long roomId,
                                 PageRequest pageRequest) {
         return CommonResponse.success(postService.findAll(roomId, pageRequest.of()).map(PostDto.Response::new));
@@ -40,9 +41,8 @@ public class PostApiController {
 
 
     @ApiOperation("게시글 상세보기")
-    @GetMapping("/{roomId}/post/{postId}")
-    public CommonResponse post(@PathVariable("postId") Long postId,
-                               PageRequest pageRequest) {
+    @GetMapping("/post/{postId}")
+    public CommonResponse post(@PathVariable("postId") Long postId) {
         return CommonResponse.success(new PostDto.Response(postService.findById(postId)));
     }
 

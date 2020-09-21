@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Where;
+import switus.user.back.studywithus.domain.file.FileGroup;
 import switus.user.back.studywithus.domain.member.Member;
 import switus.user.back.studywithus.domain.post.Post;
 import switus.user.back.studywithus.domain.common.BaseEntity;
@@ -40,15 +41,12 @@ public class Room extends BaseEntity {
     @JoinColumn(referencedColumnName = "id")
     private Category category;
 
-
     @OneToOne(fetch = LAZY)
-    @JoinColumns({@JoinColumn(referencedColumnName = "id")})
-    private FileInfo cover;
-
+    @JoinColumn(referencedColumnName = "id", columnDefinition = "BigInt comment cover image file index")
+    private FileGroup cover;
 
     @OneToMany(mappedBy = "room")
     private List<Member> members = new ArrayList<>();
-
 
     @Builder
     public Room(String name, String description, int maxCount){
@@ -57,9 +55,10 @@ public class Room extends BaseEntity {
         this.maxCount = maxCount;
     }
 
-    public void setCover(FileInfo file) {
-        this.cover = file;
+    public void setCover(FileGroup fileGroup) {
+        this.cover = fileGroup;
     }
+
 
     public void setCategory(Category category) {
         this.category = category;

@@ -22,7 +22,6 @@ import switus.user.back.studywithus.service.RoomService;
 @RequiredArgsConstructor
 public class MemberController {
 
-    private final RoomService roomService;
     private final MemberService memberService;
 
 
@@ -36,7 +35,7 @@ public class MemberController {
 
 
     @ApiOperation("멤버 탈퇴")
-    @DeleteMapping("/room/{roomId}")
+    @DeleteMapping("/room/{roomId}/member")
     public CommonResponse deleteMember(@ApiIgnore @CurrentUser Account account,
                                        @PathVariable("roomId") Long roomId) throws NotFoundException {
         memberService.deleteMember(account.getId(), roomId);

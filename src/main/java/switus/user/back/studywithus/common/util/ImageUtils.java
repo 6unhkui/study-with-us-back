@@ -4,6 +4,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.imgscalr.Scalr;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import switus.user.back.studywithus.common.error.exception.BadRequestException;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -20,7 +21,7 @@ public class ImageUtils {
     private static int THUMBNAIL_W = 100;
     private static int THUMBNAIL_H = 100;
 
-    public String getBase64String(BufferedImage src, String imageType) {
+    public String base64Encoding(BufferedImage src, String imageType) {
         StringBuilder encodeString = new StringBuilder();
         try(ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
             ImageIO.write(src, imageType, bos);
@@ -48,14 +49,14 @@ public class ImageUtils {
     }
 
 
-    public String getBase64Thumbnail(MultipartFile file) throws IOException {
+    public String getThumbnailAsBase64(MultipartFile file) throws IOException {
         String filename = file.getOriginalFilename();
         String fileExtension = FilenameUtils.getExtension(filename);
 
         BufferedImage read = ImageIO.read(file.getInputStream());
         BufferedImage image = makeThumbnail(read);
 
-        return getBase64String(image, fileExtension);
+        return base64Encoding(image, fileExtension);
     }
 
 
@@ -70,4 +71,10 @@ public class ImageUtils {
         return imgTag;
     }
 
+
+    public void verifyImageFile(MultipartFile file) {
+        if (file.getContentType() != null && !file.getContentType().startsWith("image/")) {
+            throw new BadRequestException("Invalid content-type");
+        }
+    }
 }

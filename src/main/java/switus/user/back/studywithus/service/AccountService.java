@@ -68,9 +68,9 @@ public class AccountService {
     @Transactional
     public String uploadProfileImg(Long id, MultipartFile file) throws IOException {
         Account account = findById(id);
-        String base64Thumbnail = imageUtils.getBase64Thumbnail(file);
-        account.changeProfileImg(base64Thumbnail);
-        return base64Thumbnail;
+        String base64 = imageUtils.getThumbnailAsBase64(file);
+        account.changeProfileImg(base64);
+        return base64;
     }
 
 

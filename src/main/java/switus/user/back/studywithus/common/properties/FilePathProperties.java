@@ -11,4 +11,5 @@ import org.springframework.stereotype.Component;
 public class FilePathProperties {
     private String coverImage;
     private String editorImage;
+    private String attachment;
 }

@@ -10,7 +10,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 
-import switus.user.back.studywithus.domain.file.FileType;
 import switus.user.back.studywithus.domain.room.Room;
 import switus.user.back.studywithus.dto.RoomDto;
 
@@ -19,6 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static switus.user.back.studywithus.domain.category.QCategory.category;
+import static switus.user.back.studywithus.domain.file.QFileGroup.fileGroup;
 import static switus.user.back.studywithus.domain.file.QFileInfo.fileInfo;
 import static switus.user.back.studywithus.domain.member.QMember.member;
 import static switus.user.back.studywithus.domain.room.QRoom.room;
@@ -42,8 +42,8 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
     public Page<Room> findAll(RoomDto.SearchRequest searchRequest, Pageable pageable) {
         QueryResults<Room> result = queryFactory.selectFrom(room)
                                                 .leftJoin(room.category, category).fetchJoin()
-//                                                .leftJoin(fileInfo).on(fileInfo.id.eq())
-//                                                .leftJoin(room.cover, fileInfo).fetchJoin()
+                                                .leftJoin(room.cover, fileGroup).fetchJoin()
+                                                .leftJoin(fileGroup.files, fileInfo).fetchJoin()
                                                 .where(
                                                         likeKeyword(searchRequest.getKeyword()),
                                                         inCategories(searchRequest.getCategoriesId())
@@ -61,8 +61,8 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
         QueryResults<Room> result = queryFactory.selectFrom(room)
                                                 .innerJoin(room.members, member).on(member.account.id.eq(accountId))
                                                 .leftJoin(room.category, category).fetchJoin()
-                                                .leftJoin(fileInfo).on(room.fileId.eq(fileInfo.id))
-//                                                .leftJoin(room.cover, fileInfo).fetchJoin()
+                                                .leftJoin(room.cover, fileGroup).fetchJoin()
+                                                .leftJoin(fileGroup.files, fileInfo).fetchJoin()
                                                 .where(
                                                         likeKeyword(searchRequest.getKeyword()),
                                                         inCategories(searchRequest.getCategoriesId())

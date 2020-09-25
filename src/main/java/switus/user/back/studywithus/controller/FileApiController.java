@@ -110,8 +110,9 @@ public class FileApiController {
         }
     }
 
+
     @ApiOperation("게시글 첨부파일 다운로드")
-    @GetMapping(value = "/attachment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @GetMapping("/attachment/{fileName}")
     public ResponseEntity<Resource> getAttachment(@PathVariable("fileName") String fileName) throws IOException {
         Resource resource = fileUtils.loadAsResource(FileDto.FileType.ATTACHMENT, fileName);
         return ResponseEntity.ok()

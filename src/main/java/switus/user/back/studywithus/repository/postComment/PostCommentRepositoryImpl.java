@@ -1,6 +1,7 @@
 package switus.user.back.studywithus.repository.postComment;
 
 import com.querydsl.core.QueryResults;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,9 @@ import org.springframework.util.StringUtils;
 import switus.user.back.studywithus.domain.post.Post;
 import switus.user.back.studywithus.domain.post.PostComment;
 import switus.user.back.studywithus.domain.post.QPostComment;
+import switus.user.back.studywithus.dto.RoomDto;
+
+import java.util.List;
 
 import static switus.user.back.studywithus.domain.account.QAccount.account;
 import static switus.user.back.studywithus.domain.member.QMember.member;
@@ -23,26 +27,28 @@ public class PostCommentRepositoryImpl implements PostCommentRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
-
     @Override
-    public Page<PostComment> findByPost(Long postId, Pageable pageable) {
-        QPostComment parent = new QPostComment("parent");
-        QPostComment child = new QPostComment("child");
-
-        QueryResults<PostComment> result = queryFactory.selectFrom(parent)
-                                                       .rightJoin(parent.post, post).on(post.id.eq(postId))
-                                                       .leftJoin(parent.child, child).fetchJoin()
-                                                       .leftJoin(parent.member, member)
-                                                       .leftJoin(member.account, account)
-                                                       .where(parent.depth.eq(1))
-                                                       .offset(pageable.getOffset())
-                                                       .limit(pageable.getPageSize())
-                                                       .orderBy(parent.seq.asc())
-                                                       .fetchResults();
-        return new PageImpl<>(result.getResults(), pageable, result.getTotal());
+    public List<PostComment> findByPost(Long postId) {
+        QueryResults<PostComment> results = queryFactory.selectFrom(postComment)
+                                                        .join(postComment.post, post).on(post.id.eq(postId))
+                                                        .orderBy(postComment.seq.asc())
+                                                        .fetchResults();
+        return results.getResults();
     }
 
-    private BooleanExpression equalsDepth(int depth) {
-        return postComment.depth.eq(depth);
+    @Override
+    public PostComment findMaxSeqByParent(Long parentId) {
+        return queryFactory.selectFrom(QPostComment.postComment)
+                           .where(QPostComment.postComment.parent.id.eq(parentId))
+                           .orderBy(QPostComment.postComment.seq.desc())
+                           .fetchFirst();
+    }
+
+    @Override
+    public PostComment findMaxSeq() {
+        return queryFactory.selectFrom(postComment)
+                           .where(postComment.parent.isNull())
+                           .orderBy(postComment.seq.desc())
+                           .fetchFirst();
     }
 }

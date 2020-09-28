@@ -14,6 +14,8 @@ import switus.user.back.studywithus.dto.common.CommonResponse;
 import switus.user.back.studywithus.dto.common.PageRequest;
 import switus.user.back.studywithus.service.PostCommentService;
 
+import javax.validation.Valid;
+
 @Api(tags = {"6. Post Comment"})
 @RestController
 @RequestMapping(value = "/api/v1", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -25,18 +27,35 @@ public class PostCommentApiController {
 
     @ApiOperation("댓글 작성")
     @PostMapping("/post/{postId}/comment")
-    public CommonResponse create(@ApiIgnore @CurrentUser Account account,
-                                 PostCommentDto.SaveRequest request,
-                                 @PathVariable("postId") Long postId) {
+    public CommonResponse save(@ApiIgnore @CurrentUser Account account,
+                               @Valid @RequestBody PostCommentDto.SaveRequest request,
+                               @PathVariable("postId") Long postId) {
+        return CommonResponse.success(new PostCommentDto.Response(postCommentService.save(account.getId(), postId, request)));
+    }
 
+    @ApiOperation("댓글 리스트")
+    @GetMapping("/post/{postId}/comments")
+    public CommonResponse posts(@PathVariable("postId") Long postId) {
+        return CommonResponse.success(postCommentService.findByPost(postId).stream().map(PostCommentDto.Response::new));
+    }
+
+
+    @ApiOperation("댓글 수정")
+    @PutMapping("/comment/{commentId}")
+    public CommonResponse update(@ApiIgnore @CurrentUser Account account,
+                                 @RequestBody PostCommentDto.UpdateRequest request,
+                                 @PathVariable("commentId") Long commentId) {
+        postCommentService.update(account.getId(), commentId, request);
         return CommonResponse.success();
     }
 
 
-    @ApiOperation("댓글 리스트")
-    @GetMapping("/post/{postId}/comments")
-    public CommonResponse posts(@PathVariable("postId") Long postId,
-                                PageRequest pageRequest) {
-        return CommonResponse.success(postCommentService.findByPost(postId, pageRequest.of()).map(PostCommentDto.Response::new));
+    @ApiOperation("댓글 삭제")
+    @DeleteMapping("/comment/{commentId}")
+    public CommonResponse delete(@ApiIgnore @CurrentUser Account account,
+                                 @PathVariable("commentId") Long commentId) {
+        postCommentService.delete(account.getId(), commentId);
+        return CommonResponse.success();
     }
+
 }

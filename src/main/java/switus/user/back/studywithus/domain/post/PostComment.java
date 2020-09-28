@@ -1,5 +1,6 @@
 package switus.user.back.studywithus.domain.post;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Where;
@@ -24,11 +25,12 @@ public class PostComment extends BaseEntity {
     @Id @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    private int depth;
+//    private int depth;
     private int seq;
 
     @Column(columnDefinition = "TEXT")
     private String content;
+
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id")
@@ -38,10 +40,40 @@ public class PostComment extends BaseEntity {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    @ManyToOne(fetch = EAGER)
+    @ManyToOne
     @JoinColumn(name = "parent_id")
     private PostComment parent;
 
     @OneToMany(mappedBy = "parent")
+    @OrderBy("seq")
     private List<PostComment> child;
+
+    @Builder
+    public PostComment(String content, int seq) {
+        this.content = content;
+        this.seq = seq;
+    }
+
+
+    public void setParent(PostComment parent) {
+        this.parent = parent;
+    }
+
+    public void setSeq(int seq) {
+        this.seq = seq;
+    }
+
+    public void setWriter(Member member) {
+        this.member = member;
+    }
+
+    public void setPost(Post post) {
+        this.post = post;
+    }
+
+    public void change(String content) {
+        this.content = content;
+    }
+
+
 }

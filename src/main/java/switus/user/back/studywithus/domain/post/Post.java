@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Where;
 import switus.user.back.studywithus.domain.common.BaseEntity;
+import switus.user.back.studywithus.domain.file.FileGroup;
 import switus.user.back.studywithus.domain.member.Member;
 import switus.user.back.studywithus.domain.room.Room;
 import switus.user.back.studywithus.domain.account.Account;
@@ -13,6 +14,7 @@ import javax.persistence.*;
 
 import java.util.List;
 
+import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
@@ -30,12 +32,17 @@ public class Post extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @ManyToOne(fetch = LAZY)
+
+    @ManyToOne(fetch = EAGER)
     @JoinColumn(name = "member_id")
     private Member member;
 
     @OneToMany(mappedBy = "post")
     private List<PostComment> comments;
+
+    @OneToOne(fetch = LAZY)
+    @JoinColumn(referencedColumnName = "id", columnDefinition = "BigInt")
+    private FileGroup fileGroup;
 
     @Builder
     public Post(String title, String content) {
@@ -43,8 +50,17 @@ public class Post extends BaseEntity {
         this.content = content;
     }
 
+    public void setFileGroup(FileGroup fileGroup) {
+        this.fileGroup = fileGroup;
+    }
+
+    public void editPost(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
+
     // === 연관관계 편의 메소드 ===
-    public void setAuthor(Member member) {
+    public void setWriter(Member member) {
         member.getPosts().add(this);
         this.member = member;
     }

@@ -100,11 +100,16 @@ public class FileApiController {
 
     @ApiOperation("게시글 첨부파일 등록")
     @PostMapping(value = "/attachment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public CommonResponse uploadAttachment(@RequestParam("files") MultipartFile[] files) {
+    public CommonResponse uploadAttachment(@RequestParam(value = "fileGroupId", required = false) Long fileGroupId,
+                                           @RequestParam("files") MultipartFile[] files) {
         // 요청 값으로 전달된 파일들이 빈 파일인지 체크한다.
         Arrays.stream(files).forEach(fileUtils::isNotEmpty);
         try {
-            return CommonResponse.success(new FileDto.FileGroupResponse(fileService.upload(FileDto.FileType.ATTACHMENT, files)));
+            if(fileGroupId != null) {
+                return CommonResponse.success(new FileDto.FileGroupResponse(fileService.upload(fileGroupId, FileDto.FileType.ATTACHMENT, files)));
+            }else {
+                return CommonResponse.success(new FileDto.FileGroupResponse(fileService.upload(FileDto.FileType.ATTACHMENT, files)));
+            }
         } catch (IOException e) {
             throw new InternalServerException(message.makeMultilingualMessage("profileImageUploadError"));
         }

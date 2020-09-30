@@ -47,6 +47,27 @@ public class FileService {
         return fileGroupRepository.save(FileGroup.setFiles(filesInfo));
     }
 
+    @Transactional
+    public FileGroup upload(Long fileGroupId, FileDto.FileType fileType, MultipartFile[] files) throws IOException {
+        FileGroup fileGroup = findFileGroup(fileGroupId);
+
+        Arrays.stream(files).forEach(file -> {
+            try {
+                fileGroup.addFile(fileRepository.save(fileUtils.upload(fileType, file)));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        return fileGroup;
+    }
+
+
+    @Transactional
+    public void delete(Long[] fileIds) {
+        fileRepository.deleteFiles(Arrays.asList(fileIds));
+    }
+
     public FileGroup findFileGroup(Long fileGroupId) {
         return fileGroupRepository.findById(fileGroupId).orElseThrow(() -> new NoContentException("존재하지 않는 파일입니다."));
     }

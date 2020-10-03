@@ -15,6 +15,7 @@ import switus.user.back.studywithus.common.security.constant.SecurityConstants;
 import switus.user.back.studywithus.common.error.exception.CommonRuntimeException;
 import switus.user.back.studywithus.common.error.exception.InternalServerException;
 import switus.user.back.studywithus.common.error.exception.InvalidTokenException;
+import switus.user.back.studywithus.domain.account.Account;
 import switus.user.back.studywithus.domain.account.AccountRole;
 
 import javax.annotation.PostConstruct;
@@ -49,20 +50,37 @@ public class JwtTokenProvider {
 
 
     // 토큰 생성
-    public String generate(String email, AccountRole role){
+//    public String generate(String email, AccountRole role){
+//        Date now = new Date();
+//        return Jwts.builder()
+//                .signWith(SignatureAlgorithm.HS256, secretKey) // 암호화 알고리즘, secret값 세팅
+//                .setHeaderParam("type", SecurityConstants.TOKEN_TYPE) // 토큰 타입
+//                .setIssuer(SecurityConstants.TOKEN_ISSUER) // 토큰 발급자
+//                .setAudience(SecurityConstants.TOKEN_AUDIENCE) // 토큰 대상자
+//                .setSubject(SecurityConstants.TOKEN_SUBJECT_PREFIX + email) // 토큰 제목
+//                .claim(SecurityConstants.TOKEN_CLAIM_KEY_USER_ID, email) // 토큰 데이터 - email
+//                .claim(SecurityConstants.TOKEN_CLAIM_KEY_USER_TYPE, role) // 토큰 데이터 - role
+//                .setIssuedAt(now) // 토큰 발행 일자
+//                .setExpiration(new Date(now.getTime() + SecurityConstants.TOKEN_VALID_MILISECOND)) // 토큰 만료 일자
+//                .compact();
+//    }
+
+    public String generate(Account account){
         Date now = new Date();
         return Jwts.builder()
                 .signWith(SignatureAlgorithm.HS256, secretKey) // 암호화 알고리즘, secret값 세팅
                 .setHeaderParam("type", SecurityConstants.TOKEN_TYPE) // 토큰 타입
                 .setIssuer(SecurityConstants.TOKEN_ISSUER) // 토큰 발급자
                 .setAudience(SecurityConstants.TOKEN_AUDIENCE) // 토큰 대상자
-                .setSubject(SecurityConstants.TOKEN_SUBJECT_PREFIX + email) // 토큰 제목
-                .claim(SecurityConstants.TOKEN_CLAIM_KEY_USER_ID, email) // 토큰 데이터 - email
-                .claim(SecurityConstants.TOKEN_CLAIM_KEY_USER_TYPE, role) // 토큰 데이터 - role
+                .setSubject(SecurityConstants.TOKEN_SUBJECT_PREFIX + account.getId()) // 토큰 제목
+                .claim(SecurityConstants.TOKEN_CLAIM_KEY_USER_ID, account.getEmail()) // 토큰 데이터 - email
+                .claim(SecurityConstants.TOKEN_CLAIM_KEY_USER_NAME, account.getName()) // 토큰 데이터 - Name
+                .claim(SecurityConstants.TOKEN_CLAIM_KEY_USER_TYPE, account.getRole()) // 토큰 데이터 - role
                 .setIssuedAt(now) // 토큰 발행 일자
                 .setExpiration(new Date(now.getTime() + SecurityConstants.TOKEN_VALID_MILISECOND)) // 토큰 만료 일자
                 .compact();
     }
+
 
 
     // 토큰 유효성 체그
@@ -75,14 +93,14 @@ public class JwtTokenProvider {
 
 
     // 토큰 파싱
-    public String parse(String token){
+    public Account parse(String token){
         CommonRuntimeException ex;
         try {
             Claims claims = Jwts.parser()
                     .setSigningKey(secretKey)
                     .parseClaimsJws(token)
                     .getBody();
-            return parseUserId(claims);
+            return Account.builder().email(parseUserId(claims)).name(parseUserName(claims)).build();
         } catch (SignatureException e){
             log.trace("[Invalid JWT signature]\n {}", e);
             ex = new InvalidTokenException(e.getMessage());
@@ -123,12 +141,19 @@ public class JwtTokenProvider {
         return claims.get(SecurityConstants.TOKEN_CLAIM_KEY_USER_ID, String.class);
     }
 
+    private String parseUserName(Claims claims){
+        if(!claims.containsKey(SecurityConstants.TOKEN_CLAIM_KEY_USER_NAME)){
+            throw new RequiredTypeException("UserId could not be found in claims");
+        }
+        return claims.get(SecurityConstants.TOKEN_CLAIM_KEY_USER_NAME, String.class);
+    }
+
 
     // Token을 통해 Authentication 객체 생성
     public Authentication getAuthentication(String token) {
         // Token을 파싱해서 사용자의 식별자 값을 얻고, 식별자 값을 통해 Account 엔티티를 조회한다.
         // 조회한 Account 엔티티를 Spring Security가 사용자 정보를 담아 관리하는 UserDetails 인터페이스 구현체에 넣는다.
-        UserDetails userDetails = userDetailsService.loadUserByUsername(parse(token));
+        UserDetails userDetails = userDetailsService.loadUserByUsername(parse(token).getEmail());
 
         // UsernamePasswordAuthenticationToken(Authentication 인터페이스의 구현체)을 생성한다.
         // 생성한 이 객체를 통해 AuthenticationManager가 인증 과정을 거침
@@ -139,6 +164,10 @@ public class JwtTokenProvider {
     // HttpServletRequest의 Header에서 Token 값을 가져온다.
     public String resolveToken(HttpServletRequest req) {
         return req.getHeader(HttpHeaders.AUTHORIZATION).replace(SecurityConstants.TOKEN_PREFIX,"").trim();
+    }
+
+    public String resolveToken(String token) {
+        return token.replace(SecurityConstants.TOKEN_PREFIX,"").trim();
     }
 
 }

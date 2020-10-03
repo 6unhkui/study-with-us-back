@@ -13,6 +13,7 @@ public final class SecurityConstants {
 
     public static final String TOKEN_SUBJECT_PREFIX = "USER_";
     public static final String TOKEN_CLAIM_KEY_USER_ID = "USER_ID";
+    public static final String TOKEN_CLAIM_KEY_USER_NAME = "USER_NAME";
     public static final String TOKEN_CLAIM_KEY_USER_TYPE = "USER_TYPE";
 
     public static final long TOKEN_VALID_MILISECOND = 12 * 60 * 60 * 1000; // milli-seconds

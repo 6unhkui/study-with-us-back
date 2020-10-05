@@ -16,6 +16,8 @@ import switus.user.back.studywithus.dto.RoomDto;
 import switus.user.back.studywithus.repository.member.MemberRepository;
 import switus.user.back.studywithus.repository.room.RoomRepository;
 
+import java.util.List;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -72,8 +74,10 @@ public class RoomService {
         return roomRepository.findDetail(roomId);
     }
 
+
+    @Transactional
     public void delete(Room room) {
-        roomRepository.delete(room);
+       room.delete();
     }
 
 }

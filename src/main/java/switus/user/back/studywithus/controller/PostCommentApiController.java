@@ -11,6 +11,7 @@ import switus.user.back.studywithus.domain.account.Account;
 import switus.user.back.studywithus.dto.PostCommentDto;
 import switus.user.back.studywithus.dto.PostDto;
 import switus.user.back.studywithus.dto.common.CommonResponse;
+import switus.user.back.studywithus.dto.common.CurrentAccount;
 import switus.user.back.studywithus.dto.common.PageRequest;
 import switus.user.back.studywithus.service.PostCommentService;
 
@@ -27,7 +28,7 @@ public class PostCommentApiController {
 
     @ApiOperation("댓글 작성")
     @PostMapping("/post/{postId}/comment")
-    public CommonResponse save(@ApiIgnore @CurrentUser Account account,
+    public CommonResponse save(@ApiIgnore @CurrentUser CurrentAccount account,
                                @Valid @RequestBody PostCommentDto.SaveRequest request,
                                @PathVariable("postId") Long postId) {
         return CommonResponse.success(new PostCommentDto.Response(postCommentService.save(account.getId(), postId, request)));
@@ -42,7 +43,7 @@ public class PostCommentApiController {
 
     @ApiOperation("댓글 수정")
     @PutMapping("/comment/{commentId}")
-    public CommonResponse update(@ApiIgnore @CurrentUser Account account,
+    public CommonResponse update(@ApiIgnore @CurrentUser CurrentAccount account,
                                  @RequestBody PostCommentDto.UpdateRequest request,
                                  @PathVariable("commentId") Long commentId) {
         postCommentService.update(account.getId(), commentId, request);
@@ -52,7 +53,7 @@ public class PostCommentApiController {
 
     @ApiOperation("댓글 삭제")
     @DeleteMapping("/comment/{commentId}")
-    public CommonResponse delete(@ApiIgnore @CurrentUser Account account,
+    public CommonResponse delete(@ApiIgnore @CurrentUser CurrentAccount account,
                                  @PathVariable("commentId") Long commentId) {
         postCommentService.delete(account.getId(), commentId);
         return CommonResponse.success();

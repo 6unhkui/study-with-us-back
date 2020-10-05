@@ -26,6 +26,11 @@ public class FileGroup {
         files.add(file);
     }
 
+    public void addFiles(List<FileInfo> files) {
+        files.forEach(v -> v.setFileGroup(this));
+        this.files.addAll(files);
+    }
+
     public static FileGroup setFiles(List<FileInfo> files) {
         FileGroup fileGroup = new FileGroup();
         files.forEach(file -> {

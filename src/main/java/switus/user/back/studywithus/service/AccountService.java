@@ -21,6 +21,7 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -32,8 +33,6 @@ public class AccountService {
     private final ImageUtils imageUtils;
 
     private final AccountRepository accountRepository;
-    private final FileService fileService;
-
 
     @Transactional
     public Account save(Account account){
@@ -51,7 +50,7 @@ public class AccountService {
     }
 
     private void validateDuplicateAccount(Account account){
-        accountRepository.findByEmail(account.getEmail()).ifPresent(m -> {
+        accountRepository.findByEmail(account.getEmail()).ifPresent(value -> {
             throw new BadRequestException(message.makeMultilingualMessage("accountExists"));
         });
     }
@@ -66,9 +65,8 @@ public class AccountService {
 
 
     @Transactional
-    public String uploadProfileImg(Long id, MultipartFile file) throws IOException {
+    public String uploadProfileImg(Long id, String base64) {
         Account account = findById(id);
-        String base64 = imageUtils.getThumbnailAsBase64(file);
         account.changeProfileImg(base64);
         return base64;
     }
@@ -96,5 +94,9 @@ public class AccountService {
     public void delete(Long id) {
         Account account = findById(id);
         account.delete();
+    }
+
+    public List<Account> findAccounts(List<Long> accountIds) {
+        return accountRepository.findAccounts(accountIds);
     }
 }

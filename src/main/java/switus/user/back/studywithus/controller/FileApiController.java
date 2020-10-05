@@ -43,14 +43,10 @@ public class FileApiController {
         fileUtils.isNotEmpty(file);
         // 이미지 파일 체크
         imageUtils.verifyImageFile(file);
-        try {
-            // 파일을 서버에 업로드, 파일 테이블에 파일 정보 저장
-            FileGroup fileGroup = fileService.upload(FileDto.FileType.COVER, file);
 
-            return CommonResponse.success(new FileDto.FileGroupResponse(fileGroup));
-        }catch (IOException e){
-            throw new InternalServerException(message.makeMultilingualMessage("profileImageUploadError"));
-        }
+        // 파일을 서버에 업로드, 파일 테이블에 파일 정보 저장
+        FileGroup fileGroup = fileService.upload(FileDto.FileType.COVER, file);
+        return CommonResponse.success(new FileDto.FileGroupResponse(fileGroup));
     }
 
     @ApiOperation("커버 이미지 다운로드")
@@ -74,15 +70,12 @@ public class FileApiController {
         fileUtils.isNotEmpty(file);
         // 이미지 파일 체크
         imageUtils.verifyImageFile(file);
-        try {
-            // 파일을 서버에 저장
-            FileInfo fileInfo = fileUtils.upload(FileDto.FileType.EDITOR, file);
 
-            // 에디터 이미지는 html 안에 포함하고 있으므로 DB에 저장하지 않는다.
-            return CommonResponse.success(new FileDto.Response(fileInfo));
-        }catch (IOException e){
-            throw new InternalServerException(message.makeMultilingualMessage("profileImageUploadError"));
-        }
+        // 파일을 서버에 저장
+        FileInfo fileInfo = fileUtils.upload(FileDto.FileType.EDITOR, file);
+
+        // 에디터 이미지는 html 안에 포함하고 있으므로 DB에 저장하지 않는다.
+        return CommonResponse.success(new FileDto.Response(fileInfo));
     }
 
     @ApiOperation("에디터 이미지 다운로드")
@@ -104,14 +97,12 @@ public class FileApiController {
                                            @RequestParam("files") MultipartFile[] files) {
         // 요청 값으로 전달된 파일들이 빈 파일인지 체크한다.
         Arrays.stream(files).forEach(fileUtils::isNotEmpty);
-        try {
-            if(fileGroupId != null) {
-                return CommonResponse.success(new FileDto.FileGroupResponse(fileService.upload(fileGroupId, FileDto.FileType.ATTACHMENT, files)));
-            }else {
-                return CommonResponse.success(new FileDto.FileGroupResponse(fileService.upload(FileDto.FileType.ATTACHMENT, files)));
-            }
-        } catch (IOException e) {
-            throw new InternalServerException(message.makeMultilingualMessage("profileImageUploadError"));
+
+        if(fileGroupId != null) {
+            // 이미 등록된 파일 그룹에 파일을 추가로 업로드 할 경우
+            return CommonResponse.success(new FileDto.FileGroupResponse(fileService.multiUpload(fileGroupId, FileDto.FileType.ATTACHMENT, files)));
+        }else {
+            return CommonResponse.success(new FileDto.FileGroupResponse(fileService.multiUpload(FileDto.FileType.ATTACHMENT, files)));
         }
     }
 

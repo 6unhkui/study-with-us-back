@@ -69,14 +69,14 @@ public class MemberService {
 
 
     @Transactional
-    public void deleteMember(Long accountId, Long roomIdx) {
-        Member member = findMembership(accountId, roomIdx);
+    public void withdrawal(Long accountId, Long roomId) {
+        Member member = findMembership(accountId, roomId);
 
         if(member.getRole() == MemberRole.MANAGER) {
             throw new BadRequestException("매니저는 탈퇴를 진행 할 수 없습니다.");
         }
 
-        member.deleteMember();
+        member.withdrawal();
     }
 
 }

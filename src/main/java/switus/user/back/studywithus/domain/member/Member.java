@@ -47,6 +47,8 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member")
     private List<Attendance> attendances;
 
+
+    // == 연관 관계 편의 메소드 ==
     public void setAccount(Account account) {
         this.account = account;
         account.getMembers().add(this);
@@ -71,7 +73,7 @@ public class Member extends BaseEntity {
         return member;
     }
 
-    public void deleteMember() {
+    public void withdrawal() {
         getRoom().decrementJoinCount();
         delete();
     }

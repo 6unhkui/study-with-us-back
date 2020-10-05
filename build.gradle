@@ -6,9 +6,22 @@ plugins {
 	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 }
 
+apply plugin: 'java'
+//mainClassName = 'switus.user.back.studywithus.StudyWithUsApplication'
 group = 'switus.user.back'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '1.8'
+
+jar {
+	manifest {
+		attributes 'Main-Class': 'switus.user.back.studywithus.StudyWithUsApplication'
+	}
+	from {
+		configurations.compile.collect {
+			it.isDirectory() ? it : zipTree(it)
+		}
+	}
+}
 
 configurations {
 	compileOnly {
@@ -38,8 +51,8 @@ dependencies {
 	implementation 'commons-io:commons-io:2.6' // File I/O Utility
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis' // Redis
 	implementation 'org.springframework.boot:spring-boot-starter-mail' // SMTP
-//	implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.0'
-//	implementation 'org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.1.0.RELEASE'
+	implementation 'org.springframework:spring-messaging:5.2.8.RELEASE' // inbound message 처리를 위한 라이브러리
+	implementation 'org.springframework.boot:spring-boot-starter-websocket' // stomp
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'mysql:mysql-connector-java'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'

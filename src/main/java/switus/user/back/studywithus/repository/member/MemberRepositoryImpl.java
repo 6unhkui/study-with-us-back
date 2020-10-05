@@ -48,7 +48,10 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                                                    .where(
                                                         likeKeyword(searchRequest.getKeyword())
                                                    )
-                                                   .orderBy(order(searchRequest.getOrderType()))
+                                                   .orderBy(
+                                                           order(MemberDto.SearchRequest.OrderType.ROLE),
+                                                           order(searchRequest.getOrderType())
+                                                   )
                                                    .offset(pageable.getOffset())
                                                    .limit(pageable.getPageSize())
                                                    .fetchResults();
@@ -67,10 +70,10 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
         switch (orderType) {
             case JOIN_DATE:
                 return member.insDate.desc();
-            case ROLE:
-                return member.role.desc();
-            default:
+            case NAME:
                 return member.account.name.asc();
+            default:
+                return member.role.desc();
         }
     }
 

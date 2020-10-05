@@ -17,6 +17,7 @@ import switus.user.back.studywithus.domain.account.Account;
 import switus.user.back.studywithus.dto.AccountDto;
 import switus.user.back.studywithus.dto.common.AccessToken;
 import switus.user.back.studywithus.dto.common.CommonResponse;
+import switus.user.back.studywithus.dto.common.CurrentAccount;
 import switus.user.back.studywithus.service.AccountService;
 
 import javax.validation.Valid;
@@ -49,7 +50,7 @@ public class AuthApiController {
 
         // 비밀번호가 일치하면 토큰을 발급한다.
         if (passwordEncoder.matches(request.getPassword(), account.getPassword())) {
-            AccessToken token = AccessToken.builder().accessToken(jwtTokenProvider.generate(account.getEmail(), account.getRole())).build();
+            AccessToken token = AccessToken.builder().accessToken(jwtTokenProvider.generate(new CurrentAccount(account))).build();
             return CommonResponse.success(token);
         }
 

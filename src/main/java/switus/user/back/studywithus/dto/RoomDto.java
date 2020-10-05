@@ -2,13 +2,16 @@ package switus.user.back.studywithus.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import org.springframework.beans.factory.annotation.Value;
 import switus.user.back.studywithus.domain.member.Member;
 import switus.user.back.studywithus.domain.member.MemberRole;
 import switus.user.back.studywithus.domain.room.Room;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Optional;
 
 
@@ -22,7 +25,7 @@ public class RoomDto {
         private boolean unlimited;
         private int maxCount;
         private Long categoryId;
-        private Long fileId;
+        private Long fileGroupId;
 
         public Room toEntity(){
             if(unlimited) maxCount = 0;
@@ -45,7 +48,7 @@ public class RoomDto {
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Response {
-        private Long id;
+        private Long roomId;
         private String name;
         private String description;
         private int maxCount;
@@ -56,15 +59,16 @@ public class RoomDto {
         private MemberDto.Response manager;
 
         public Response(Room room, Member manager){
-            this.id = room.getId();
+            this.roomId = room.getId();
             this.name = room.getName();
             this.description = room.getDescription();
             this.maxCount = room.getMaxCount();
             this.category = room.getCategory().getName();
             this.joinCount = room.getJoinCount();
 
-//            if(null != room.getCover())
-//                this.coverImage = room.getFileId();
+            if(null != room.getCover() && room.getCover().getFiles().size() > 0) {
+                this.coverImage = room.getCover().getFiles().get(0).getSaveName();
+            }
 
             if(null != manager){
                 this.manager = new MemberDto.Response(manager);
@@ -76,7 +80,7 @@ public class RoomDto {
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class DetailResponse {
-        private Long id;
+        private Long roomId;
         private String name;
         private String description;
         private boolean unlimited = true;
@@ -91,18 +95,14 @@ public class RoomDto {
 
         private MemberDto.Response manager;
 
-        private currentAccount currentAccount = new currentAccount();
+        @JsonProperty("isManager")
+        private boolean isManager;
 
-        @Getter @Setter
-        private class currentAccount {
-            private boolean isMember = false;
-            private MemberRole role;
-
-            public currentAccount() {}
-        }
+        @JsonProperty("isMember")
+        private boolean isMember;
 
         public DetailResponse(Room room, Member manager, Optional<Member> currentAccountMembership){
-            this.id = room.getId();
+            this.roomId = room.getId();
             this.name = room.getName();
             this.description = room.getDescription();
             this.createDate = room.getInsDate();
@@ -114,13 +114,13 @@ public class RoomDto {
                 this.maxCount = room.getMaxCount();
             }
 
-//            if(null != room.getCover()) {
-//                this.coverImage = room.getCover().getSaveName();
-//            }
+            if(null != room.getCover() && room.getCover().getFiles().size() > 0) {
+                this.coverImage = room.getCover().getFiles().get(0).getSaveName();
+            }
 
             if(currentAccountMembership.isPresent()){
-                this.currentAccount.setMember(true);
-                this.currentAccount.setRole(currentAccountMembership.get().getRole());
+                this.isMember = true;
+                this.isManager = currentAccountMembership.get().getRole().equals(MemberRole.MANAGER);
             }
 
             if(null != manager){

@@ -11,6 +11,7 @@ import switus.user.back.studywithus.domain.account.Account;
 import switus.user.back.studywithus.dto.MemberDto;
 import switus.user.back.studywithus.dto.PostDto;
 import switus.user.back.studywithus.dto.common.CommonResponse;
+import switus.user.back.studywithus.dto.common.CurrentAccount;
 import switus.user.back.studywithus.dto.common.PageRequest;
 import switus.user.back.studywithus.service.PostService;
 
@@ -25,9 +26,9 @@ public class PostApiController {
 
     @ApiOperation("게시글 작성")
     @PostMapping("/room/{roomId}/post")
-    public CommonResponse write(@ApiIgnore @CurrentUser Account account,
-                                 @RequestBody PostDto.SaveRequest request,
-                                 @PathVariable("roomId") Long roomId) {
+    public CommonResponse write(@ApiIgnore @CurrentUser CurrentAccount account,
+                                @RequestBody PostDto.SaveRequest request,
+                                @PathVariable("roomId") Long roomId) {
         postService.save(account.getId(), roomId, request);
         return CommonResponse.success();
     }
@@ -44,14 +45,16 @@ public class PostApiController {
 
     @ApiOperation("게시글 상세보기")
     @GetMapping("/post/{postId}")
-    public CommonResponse detail(@PathVariable("postId") Long postId) {
-        return CommonResponse.success(new PostDto.DetailResponse(postService.findById(postId)));
+    public CommonResponse detail(@ApiIgnore @CurrentUser CurrentAccount account,
+                                 @PathVariable("postId") Long postId) {
+        return CommonResponse.success(
+                new PostDto.DetailResponse(postService.findById(postId), account.getId()));
     }
 
 
     @ApiOperation("게시글 수정")
     @PutMapping("/post/{postId}")
-    public CommonResponse update(@ApiIgnore @CurrentUser Account account,
+    public CommonResponse update(@ApiIgnore @CurrentUser CurrentAccount account,
                                  @RequestBody PostDto.UpdateRequest request,
                                  @PathVariable("postId") Long postId) {
         postService.update(account.getId(), postId, request);
@@ -61,7 +64,7 @@ public class PostApiController {
 
     @ApiOperation("게시글 삭제")
     @DeleteMapping("/post/{postId}")
-    public CommonResponse delete(@ApiIgnore @CurrentUser Account account,
+    public CommonResponse delete(@ApiIgnore @CurrentUser CurrentAccount account,
                                  @PathVariable("postId") Long postId) {
         postService.delete(account.getId(), postId);
         return CommonResponse.success();

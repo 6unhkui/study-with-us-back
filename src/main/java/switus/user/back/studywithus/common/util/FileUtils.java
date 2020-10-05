@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import switus.user.back.studywithus.common.error.exception.BadRequestException;
+import switus.user.back.studywithus.common.error.exception.InternalServerException;
 import switus.user.back.studywithus.common.error.exception.InvalidFileAccessException;
 import switus.user.back.studywithus.common.properties.FilePathProperties;
 import switus.user.back.studywithus.domain.file.FileInfo;
@@ -22,14 +23,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class FileUtils {
 
+    private final MultilingualMessageUtils message;
     private final FilePathProperties filePathProperties;
 
     @PostConstruct
@@ -67,7 +68,7 @@ public class FileUtils {
     }
 
 
-    public FileInfo upload(FileDto.FileType fileType, MultipartFile file) throws IOException {
+    public FileInfo upload(FileDto.FileType fileType, MultipartFile file) {
         String originName = StringUtils.cleanPath(Objects.requireNonNull(FilenameUtils.getName(file.getOriginalFilename())));
         String extension = FilenameUtils.getExtension(originName).toLowerCase();
         String saveName = generateUniqueFileName();
@@ -76,7 +77,11 @@ public class FileUtils {
 
         Path dest = Paths.get(getPathPropForFileType(fileType))
                          .toAbsolutePath().normalize().resolve(saveName);
-        Files.copy(file.getInputStream(), dest, StandardCopyOption.REPLACE_EXISTING);
+        try {
+            Files.copy(file.getInputStream(), dest, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new InternalServerException(message.makeMultilingualMessage("fileUploadError"));
+        }
 
         return FileInfo.builder().originName(originName)
                                  .saveName(saveName)
@@ -84,6 +89,16 @@ public class FileUtils {
                                  .extension(extension)
                                  .fileSize(size)
                                  .build();
+    }
+
+
+    public List<FileInfo> multiUpload(FileDto.FileType fileType, MultipartFile[] files) {
+        List<FileInfo> fileInfoList = new ArrayList<>();
+        Arrays.stream(files).forEach(file -> {
+            fileInfoList.add(upload(fileType, file));
+        });
+
+        return fileInfoList;
     }
 
 

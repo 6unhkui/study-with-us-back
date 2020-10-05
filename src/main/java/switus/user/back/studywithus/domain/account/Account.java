@@ -45,7 +45,8 @@ public class Account extends BaseEntity {
     private List<Member> members = new ArrayList<>();
 
     @Builder
-    public Account(String email, String password, String name, String profileImg, AccountRole role, AuthProvider provider) {
+    public Account(Long id, String email, String password, String name, String profileImg, AccountRole role, AuthProvider provider) {
+        this.id = id;
         this.email = email;
         this.password = password;
         this.name = name;
@@ -62,18 +63,5 @@ public class Account extends BaseEntity {
 
     public void changeProfileImg(String profileImg){
         this.profileImg = profileImg;
-    }
-
-    @Override
-    public String toString() {
-        return "Account{" +
-                "id=" + id +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", name='" + name + '\'' +
-                ", profileImg='" + profileImg + '\'' +
-                ", role=" + role +
-                ", provider=" + provider +
-                '}';
     }
 }

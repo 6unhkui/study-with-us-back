@@ -28,37 +28,22 @@ public class FileService {
     private final FileUtils fileUtils;
 
     @Transactional
-    public FileGroup upload(FileDto.FileType fileType, MultipartFile file) throws IOException {
+    public FileGroup upload(FileDto.FileType fileType, MultipartFile file) {
         FileInfo fileInfo = fileRepository.save(fileUtils.upload(fileType, file));
         return fileGroupRepository.save(FileGroup.setFiles(Collections.singletonList(fileInfo)));
     }
 
     @Transactional
-    public FileGroup upload(FileDto.FileType fileType, MultipartFile[] files) throws IOException {
-        List<FileInfo> filesInfo = new ArrayList<>();
-        Arrays.stream(files).forEach(file -> {
-            try {
-                filesInfo.add(fileRepository.save(fileUtils.upload(fileType, file)));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-
-        return fileGroupRepository.save(FileGroup.setFiles(filesInfo));
+    public FileGroup multiUpload(FileDto.FileType fileType, MultipartFile[] files) {
+        List<FileInfo> fileInfoList = fileUtils.multiUpload(fileType, files);
+        return fileGroupRepository.save(FileGroup.setFiles(fileRepository.saveAll(fileInfoList)));
     }
 
     @Transactional
-    public FileGroup upload(Long fileGroupId, FileDto.FileType fileType, MultipartFile[] files) throws IOException {
+    public FileGroup multiUpload(Long fileGroupId, FileDto.FileType fileType, MultipartFile[] files) {
         FileGroup fileGroup = findFileGroup(fileGroupId);
-
-        Arrays.stream(files).forEach(file -> {
-            try {
-                fileGroup.addFile(fileRepository.save(fileUtils.upload(fileType, file)));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-
+        List<FileInfo> fileInfoList = fileUtils.multiUpload(fileType, files);
+        fileGroup.addFiles(fileRepository.saveAll(fileInfoList));
         return fileGroup;
     }
 

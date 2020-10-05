@@ -3,8 +3,11 @@ package switus.user.back.studywithus.repository.member;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import switus.user.back.studywithus.domain.account.Account;
 import switus.user.back.studywithus.domain.member.Member;
 import switus.user.back.studywithus.dto.MemberDto;
+
+import java.util.List;
 
 public interface MemberRepositoryCustom {
     Member findMembership(Long accountId, Long roomId);

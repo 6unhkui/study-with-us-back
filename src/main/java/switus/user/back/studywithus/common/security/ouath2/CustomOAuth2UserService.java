@@ -10,6 +10,8 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import switus.user.back.studywithus.common.security.CustomUserDetails;
 import switus.user.back.studywithus.domain.account.Account;
+import switus.user.back.studywithus.dto.AccountDto;
+import switus.user.back.studywithus.dto.common.CurrentAccount;
 import switus.user.back.studywithus.repository.AccountRepository;
 
 import java.util.Optional;
@@ -36,15 +38,15 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         // OAuth2UserService를 통해 가져온 OAuth2User의 attribute를 CustomUserDetails에 담는다.
         CustomUserDetails userDetails = CustomUserDetails.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
 
-        saveAccount(userDetails.getAccount());
+        Account account = saveAccount(userDetails.getAccount().toEntity());
+        userDetails.setAccount(new CurrentAccount(account));
 
         return userDetails;
     }
 
-    private void saveAccount(Account account) {
-        if(!accountRepository.findByEmail(account.getEmail()).isPresent()){
-            accountRepository.save(account);
-        }
+    private Account saveAccount(Account account) {
+        Optional<Account> byEmail = accountRepository.findByEmail(account.getEmail());
+        return byEmail.orElseGet(() -> accountRepository.save(account));
     }
 
 

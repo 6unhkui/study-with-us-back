@@ -16,6 +16,10 @@ import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.frameoptions.WhiteListedAllowFromStrategy;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.CorsUtils;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import switus.user.back.studywithus.common.security.*;
 import switus.user.back.studywithus.common.security.filter.CorsFilter;
 import switus.user.back.studywithus.common.security.filter.JwtAuthenticationFilter;
@@ -73,10 +77,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
        http.httpBasic().disable() // Rest API 이므로, 비인증시 로그인 폼으로 리다이렉트 되는 기본 설정을 사용하지 않는다.
            .csrf().disable() // Rest API 이므로, Cross Site Request Forgery(CSRF) 보안이 필요없음
            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Session을 사용하지 않음
+           .and().headers().frameOptions().sameOrigin()
            .and()
                .authorizeRequests()
-                    .antMatchers("/*/*/auth/**").permitAll() // 인증(로그인, 회원가입)은 모두 접근 가능
-                    .antMatchers("/api/v1/files/**", "/api/v1/rooms", "/api/v1/categories").permitAll()
+                    .antMatchers("/*/*/auth/**").permitAll() // 인증(로그인, 회원가입) API 모두 접근 가능
+                    .antMatchers("/api/v1/files/**", "/api/v1/rooms", "/api/v1/categories", "/chatting/**").permitAll()
                     .antMatchers("/api/v1/admin/**").hasRole(AccountRole.ADMIN.name()) // 특정 권한만 접근 가능. Security는 role 앞에 prefix로 "ROLE_"를 붙여 사용한다.
                     .anyRequest().authenticated()  // 그 외 요청은 인증이 필요하다
            .and()
@@ -101,7 +106,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilterBefore(new CorsFilter(), ChannelProcessingFilter.class) // cors 필터 등록
             .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);// JWT Token 필터를 id,password 인증 필터 전에 동작하도록 설정
     }
-
 
     @Override
     public void configure(WebSecurity web) throws Exception {

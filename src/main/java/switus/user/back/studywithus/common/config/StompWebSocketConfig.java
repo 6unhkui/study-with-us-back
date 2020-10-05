@@ -3,6 +3,7 @@ package switus.user.back.studywithus.common.config;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.config.ChannelRegistration;
@@ -14,15 +15,22 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+import switus.user.back.studywithus.common.error.exception.UnauthorizedException;
+import switus.user.back.studywithus.common.security.CustomUserDetails;
 import switus.user.back.studywithus.common.security.JwtTokenProvider;
 import switus.user.back.studywithus.domain.account.Account;
+import switus.user.back.studywithus.domain.chat.ChatMember;
 import switus.user.back.studywithus.domain.chat.ChatMessage;
 import switus.user.back.studywithus.dto.AccountDto;
+import switus.user.back.studywithus.dto.ChatMessageDto;
 import switus.user.back.studywithus.service.ChatService;
 
 import java.security.Principal;
 import java.util.Objects;
 import java.util.Optional;
+
+import static java.lang.String.format;
 
 @Slf4j
 @Configuration
@@ -53,44 +61,59 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
             @Override
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
                 StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+                switch (accessor.getCommand()){
+                    case CONNECT: { // websocket connection 요청
+                        // connection 시, 토큰을 검증한다.
+                        String token = jwtTokenProvider.resolveToken(Objects.requireNonNull(accessor.getFirstNativeHeader("Authorization")));
+                        if(!jwtTokenProvider.validateToken(token)) {
+                            throw new UnauthorizedException("인증되지 않은 사용자 요청입니다.");
+                        }
+                        break;
+                    }
+                    case SUBSCRIBE: { // 채팅룸 구독요청
+                        // header에 담긴 토큰으로 유저 정보를 얻는다.
+                        String token = jwtTokenProvider.resolveToken(Objects.requireNonNull(accessor.getFirstNativeHeader("Authorization")));
+                        Authentication authentication = jwtTokenProvider.getAuthentication(token);
+                        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+                        ChatMember chatMember = new ChatMember(userDetails.getAccount());
 
-                if (StompCommand.CONNECT == accessor.getCommand()) { // websocket 연결요청
-                    String token = jwtTokenProvider.resolveToken(Objects.requireNonNull(accessor.getFirstNativeHeader("Authorization")));
-                    jwtTokenProvider.validateToken(token);
+                        String sessionId = (String) message.getHeaders().get("simpSessionId");
 
-                } else if (StompCommand.SUBSCRIBE == accessor.getCommand()) { // 채팅룸 구독요청
-                    String token = jwtTokenProvider.resolveToken(Objects.requireNonNull(accessor.getFirstNativeHeader("Authorization")));
-                    Account account = jwtTokenProvider.parse(token);
+                        // header에서 구독 destination 정보를 얻고, roomId를 추출한다.
+                        Long roomId = chatService.getRoomId(Optional.ofNullable((String) message.getHeaders().get("simpDestination")).orElse("InvalidRoomId"));
 
-                    // header정보에서 구독 destination정보를 얻고, roomId를 추출한다.
-                    Long roomId = chatService.getRoomId(Optional.ofNullable((String) message.getHeaders().get("simpDestination")).orElse("InvalidRoomId"));
-                    System.out.println(roomId);
+                        // 입장한 클라어인트를 추가한다.
+                        chatService.addChatMember(roomId, sessionId, chatMember);
 
-                    // 채팅방에 들어온 클라이언트 sessionId를 roomId와 맵핑해 놓는다.(나중에 특정 세션이 어떤 채팅방에 들어가 있는지 알기 위함)
-                    String sessionId = (String) message.getHeaders().get("simpSessionId");
-                    chatService.setUserEnterInfo(sessionId, roomId);
+                        // 클라이언트 입장 메시지를 채팅방에 발송한다.(redis publish)
+                        ChatMessageDto messageDto = ChatMessageDto.builder().type(ChatMessage.Type.ENTER).roomId(roomId).sender(chatMember).build();
+                        chatService.sendChatMessage(messageDto);
 
-                    // 채팅방의 인원수를 +1한다.
-                    chatService.plusUserCount(roomId);
+                        // roomId를 세션 속성값으로 넣어준다.
+                        accessor.getSessionAttributes().put("roomId", roomId);
+                        log.info("SUBSCRIBED {}, {}", userDetails.getAccount().getName(), roomId);
+                        break;
+                    }
+                    case DISCONNECT: { // websocket disconnect
+                        String sessionId = (String) message.getHeaders().get("simpSessionId");
 
-                    // 클라이언트 입장 메시지를 채팅방에 발송한다.(redis publish)
-                    chatService.sendChatMessage(ChatMessage.builder().type(ChatMessage.Type.ENTER).roomId(roomId).sender(new AccountDto.Response(account)).build());
-                    log.info("SUBSCRIBED {}, {}", account.getName(), roomId);
-                } else if (StompCommand.DISCONNECT == accessor.getCommand()) { // Websocket 연결 종료
-                    System.out.println(message.toString());
-                    // 연결이 종료된 클라이언트 sesssionId로 채팅방 id를 얻는다.
-                    String sessionId = (String) message.getHeaders().get("simpSessionId");
-                    Long roomId = chatService.getUserEnterRoomId(sessionId);
+                        // 세션 속성 값에서 roomId를 가져온다.
+                        Long roomId = (Long) accessor.getSessionAttributes().get("roomId");
 
-//                    // 채팅방의 인원수를 -1한다.
-                    chatService.minusUserCount(roomId);
+                        // sessionId와 roomId로 퇴장하는 클라이언트 정보를 얻는다.
+                        ChatMember chatMember = chatService.getChatMember(roomId, sessionId);
 
-                    // 클라이언트 퇴장 메시지를 채팅방에 발송한다.(redis publish)
-                    String name = Optional.ofNullable((Principal) message.getHeaders().get("simpUser")).map(Principal::getName).orElse("UnknownUser");
-                    chatService.sendChatMessage(ChatMessage.builder().type(ChatMessage.Type.QUIT).roomId(roomId).sender(new AccountDto.Response(Account.builder().name(name).build())).build());
-//                    // 퇴장한 클라이언트의 roomId 맵핑 정보를 삭제한다.
-                    chatService.removeUserEnterInfo(sessionId);
-//                    log.info("DISCONNECTED {}, {}", sessionId, roomId);
+                        // 클라이언트 퇴장 메시지를 채팅방에 발송한다.(redis publish)
+                        ChatMessageDto messageDto = ChatMessageDto.builder().type(ChatMessage.Type.QUIT).roomId(roomId).sender(chatMember).build();
+                        chatService.sendChatMessage(messageDto);
+
+                        // 퇴장하는 클라이언트 정보를 redis에서 삭제한다.
+                        chatService.removeChatMember(roomId, sessionId);
+
+                        log.info("DISCONNECTED {}, {}", sessionId, roomId);
+                        break;
+                    }
+                    default: {}
                 }
                 return message;
             }

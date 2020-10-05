@@ -10,6 +10,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import switus.user.back.studywithus.domain.account.AccountRole;
 import switus.user.back.studywithus.domain.account.AuthProvider;
 import switus.user.back.studywithus.domain.account.Account;
+import switus.user.back.studywithus.dto.common.CurrentAccount;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -21,23 +22,24 @@ import java.util.Map;
 @Getter @Setter
 public class CustomUserDetails implements UserDetails, OAuth2User {
 
-    private Account account;
+    private CurrentAccount account;
+
     // OAuth2
     private String nameAttributeKey;  // OAuth2 로그인 진행 시 키가 되는 필드 값. Primary Key와 같은 의미임
     private Map<String, Object> attributes; // Provider가 제공하는 유저의 정보 값
 
 
     public CustomUserDetails(Account account) {
-        this.account = account;
+        this.account = new CurrentAccount(account);
     }
 
-    public Account getAccount() {
+    public CurrentAccount getAccount() {
         return account;
     }
 
 
     @Builder
-    public CustomUserDetails(Map<String, Object> attributes, String nameAttributeKey, Account account) {
+    public CustomUserDetails(Map<String, Object> attributes, String nameAttributeKey, CurrentAccount account) {
         this.attributes = attributes;
         this.nameAttributeKey = nameAttributeKey;
         this.account = account;
@@ -112,7 +114,7 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
     public static CustomUserDetails ofGoogle(String userNameAttributeName,
                                              Map<String, Object> attributes) {
         return CustomUserDetails.builder()
-                                .account(Account.builder()
+                                .account(CurrentAccount.builder()
                                         .name((String)attributes.get("name"))
                                         .email((String)attributes.get("email"))
                                         .profileImg((String)attributes.get("picture"))
@@ -128,7 +130,7 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
         Map<String, Object> response = (Map<String, Object>)attributes.get("response");
 
         return CustomUserDetails.builder()
-                .account(Account.builder()
+                .account(CurrentAccount.builder()
                         .name((String)response.get("name"))
                         .email((String)response.get("email"))
                         .profileImg((String)response.get("profile_image"))

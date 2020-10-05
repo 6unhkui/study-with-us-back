@@ -1,35 +1,36 @@
-package switus.user.back.studywithus.domain.chat;
+package switus.user.back.studywithus.dto;
 
-import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.redis.core.RedisHash;
 import org.springframework.format.annotation.DateTimeFormat;
-import switus.user.back.studywithus.dto.AccountDto;
+import switus.user.back.studywithus.domain.chat.ChatMember;
+import switus.user.back.studywithus.domain.chat.ChatMessage;
 
-import java.io.Serializable;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
-public class ChatMessage implements Serializable {
-    private static final long serialVersionUID = 6494678977089006639L;
-
+public class ChatMessageDto {
     public enum Type {
         ENTER, QUIT, TALK
     }
 
-    private Type type;
+    private Long roomId;
+    private ChatMessage.Type type;
     private ChatMember sender;
     private String message;
+    private Long memberCount;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @DateTimeFormat(pattern = "yyyy-MM-dd kk:mm:ss")
     private LocalDateTime timestamp;
 
+    public ChatMessage toEntity() {
+        return ChatMessage.builder().type(type).message(message).sender(sender).timestamp(timestamp).build();
+    }
 }

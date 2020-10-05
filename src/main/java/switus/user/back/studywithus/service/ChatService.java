@@ -1,96 +1,111 @@
 package switus.user.back.studywithus.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.*;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
+import switus.user.back.studywithus.domain.chat.ChatMember;
 import switus.user.back.studywithus.domain.chat.ChatMessage;
-import switus.user.back.studywithus.domain.chat.ChatRoom;
-import switus.user.back.studywithus.domain.room.Room;
+import switus.user.back.studywithus.dto.ChatMessageDto;
 
 import javax.annotation.Resource;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+
+import static java.lang.String.format;
+import static switus.user.back.studywithus.common.constant.RedisCacheKey.*;
 
 @Service
 @RequiredArgsConstructor
 public class ChatService {
 
+    private final ObjectMapper objectMapper;
     private final ChannelTopic channelTopic;
     private final RedisTemplate redisTemplate;
 
-    // Redis CacheKeys
-    private static final String CHAT_ROOMS = "CHAT_ROOMS"; // 채팅룸 저장
-    public static final String USER_COUNT = "USER_COUNT"; // 채팅룸에 입장한 클라이언트수 저장
-    public static final String ENTER_INFO = "ENTER_INFO"; // 채팅룸에 입장한 클라이언트의 sessionId와 채팅룸 id를 맵핑한 정보 저장
-
+    /**
+     * 채팅 메시지를 리스트로 저장한다.
+     * - key : CHAT_ROOM:${roomId}:MESSAGES
+     * - value : ChatMessage 객체를 직렬화 한 데이터
+     * % value 값으로 ChatMessage를 저장하지 않은 이유 : list로 객체를 저장할 때 역직렬화 과정에서 에러가 발생됨
+     */
     @Resource(name = "redisTemplate")
-    private HashOperations<String, Long, ChatRoom> hashOpsChatRoom;
-    @Resource(name = "redisTemplate")
-    private HashOperations<String, Long, Long> hashOpsEnterUserInfo;
-
-
-    @Resource(name = "redisTemplate")
-    private HashOperations<String, String, Long> hashOpsEnterInfo;
-    @Resource(name = "redisTemplate")
-    private ValueOperations<String, String> valueOps;
-
-    // 특정 채팅방 조회
-    public ChatRoom findRoomById(Long roomId) {
-        return hashOpsChatRoom.get(CHAT_ROOMS, roomId);
-    }
-
-    // 특정 채팅방 조회
-//    public List<ChatMessage> findRoomById(Long roomId) {
-//        return hashOpsChatRoom.get(CHAT_ROOMS, roomId);
-//    }
-
-    // 채팅방 생성 : 서버간 채팅방 공유를 위해 redis hash에 저장한다.
-    public ChatRoom createChatRoom(Room room)  {
-        ChatRoom chatRoom =  new ChatRoom(room);
-        hashOpsChatRoom.put(CHAT_ROOMS, chatRoom.getRoomId(), chatRoom);
-        return chatRoom;
-    }
-
-    // 유저가 입장한 채팅방ID와 유저 세션ID 맵핑 정보 저장
-    public void setUserEnterInfo(String sessionId, Long roomId) {
-        hashOpsEnterInfo.put(ENTER_INFO, sessionId, roomId);
-    }
-
-    // 유저 세션으로 입장해 있는 채팅방 ID 조회
-    public Long getUserEnterRoomId(String sessionId) {
-        return hashOpsEnterInfo.get(ENTER_INFO, sessionId);
-    }
-
-    // 유저 세션정보와 맵핑된 채팅방ID 삭제
-    public void removeUserEnterInfo(String sessionId) {
-        hashOpsEnterInfo.delete(ENTER_INFO, sessionId);
-    }
-
-    // 채팅방 유저수 조회
-    public long getUserCount(Long roomId) {
-        return Long.parseLong(Optional.ofNullable(valueOps.get(USER_COUNT + "_" + roomId)).orElse("0"));
-    }
-
-    // 채팅방에 입장한 유저수 +1
-    public long plusUserCount(Long roomId) {
-        return Optional.ofNullable(valueOps.increment(USER_COUNT + "_" + roomId)).orElse(0L);
-    }
-
-    // 채팅방에 입장한 유저수 -1
-    public long minusUserCount(Long roomId) {
-        return Optional.ofNullable(valueOps.decrement(USER_COUNT + "_" + roomId)).filter(count -> count > 0).orElse(0L);
-    }
+    private ListOperations<String, String> listOpsMessage;
 
     /**
-     * destination정보에서 roomId 추출
+     * 현재 채팅방에 입장한 클라이언트의 sessionId를 hash key 값으로 하여 ChatMember 객체에 클라이언트 정보를 담아 저장한다.
+     * - key : CHAT_ROOM:${roomId}:MEMBERS
+     * - hashKey : sessionId
+     * - value : ChatMember
      */
+    @Resource(name = "redisTemplate")
+    private HashOperations<String, String, ChatMember> hashOpsChatMember;
+
+
+    // 입장한 클라이언트 추가
+    public void addChatMember(Long roomId, String sessionId, ChatMember chatMember) {
+        String key = makeKey(roomId, MEMBERS);
+        hashOpsChatMember.putIfAbsent(key, sessionId, chatMember);
+    }
+
+    // 채팅 방에 접속중인 클라이언트 리스트
+    public List<ChatMember> getChatMembers(Long roomId) {
+        String key = makeKey(roomId, MEMBERS);
+        Map<String, ChatMember> entries = hashOpsChatMember.entries(key);
+        return new ArrayList<>(entries.values());
+    }
+
+    // roomId와 sessionId로 현재 접속중인 클라이언트 정보를 얻음
+    public ChatMember getChatMember(Long roomId, String sessionId) {
+        String key = makeKey(roomId, MEMBERS);
+        return hashOpsChatMember.get(key, sessionId);
+    }
+
+    // 퇴장한 클라이언트 리스트에서 삭제
+    public void removeChatMember(Long roomId, String sessionId) {
+        String key = makeKey(roomId, MEMBERS);
+        hashOpsChatMember.delete(key, sessionId);
+    }
+
+    // 현재 채팅 참여중인 클라이언트 수
+    public Long getChatMemberCount(Long roomId) {
+        String key = makeKey(roomId, MEMBERS);
+        return hashOpsChatMember.size(key);
+    }
+
+
+    // 채팅 메시지를 직렬화하여 저장한다.
+    public void setChatMessage(Long roomId, ChatMessage chatMessage) {
+        try {
+            String key = makeKey(roomId, MESSAGES);
+            String value = objectMapper.writeValueAsString(chatMessage);
+            listOpsMessage.rightPush(key, value);
+        }catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 채팅 메시지 리스트를 레디스에서 가져오고 리스트에 담긴 값을 역직렬화 하여 리턴한다.
+    public List<ChatMessage> getChatMessages(Long roomId){
+        String key = makeKey(roomId, MESSAGES);
+        List<String> range = listOpsMessage.range(key, 0, -1);
+
+        List<ChatMessage> chatMessages = new ArrayList<>();
+        for(String s : range) {
+            try {
+                chatMessages.add(objectMapper.readValue(s, ChatMessage.class));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        }
+
+       return chatMessages;
+    }
+
+
+    // destination 정보에서 roomId를 추출한다.
     public Long getRoomId(String destination) {
         int lastIndex = destination.lastIndexOf('/');
         if (lastIndex != -1)
@@ -99,16 +114,33 @@ public class ChatService {
             return 0L;
     }
 
+    // key 값을 생성한다.
+    // CHAT_ROOM:${roomId}:${...ArgumentValue}
+    public String makeKey(Long roomId, String ...value) {
+        String prefix = format("%s:%s", CHAT_ROOM, roomId);
+        String result = value.length > 0 ? ":" + String.join(":", value) : "";
+        return prefix + result;
+    }
 
-    public void sendChatMessage(ChatMessage chatMessage) {
-        chatMessage.setUserCount(getUserCount(chatMessage.getRoomId()));
-        chatMessage.setTimestamp(LocalDateTime.now());
+
+    // 메시지 저장 및 publish
+    public void sendChatMessage(ChatMessageDto chatMessage) {
+        String senderName = Optional.ofNullable(chatMessage.getSender().getName()).orElse("UnknownUser");
         if (ChatMessage.Type.ENTER.equals(chatMessage.getType())) {
-            chatMessage.setMessage(chatMessage.getSender().getName() + "님이 방에 입장했습니다.");
+            chatMessage.setMessage(format("[%s]님이 입장했습니다", senderName));
         } else if (ChatMessage.Type.QUIT.equals(chatMessage.getType())) {
-            chatMessage.setMessage(chatMessage.getSender().getName() + "님이 방에서 나갔습니다.");
+            chatMessage.setMessage(format("[%s]님이 퇴장했습니다.", senderName));
         }
 
+        chatMessage.setTimestamp(LocalDateTime.now());
+
+        // 메시지를 저장한다.
+        setChatMessage(chatMessage.getRoomId(), chatMessage.toEntity());
+
+        // 현재 접속중인 멤버 수를 publish 데이터로 함께 전달한다.
+        chatMessage.setMemberCount(getChatMemberCount(chatMessage.getRoomId()));
+
+        // 기본 채널 토픽으로 메시지를 Publish 한다.
         redisTemplate.convertAndSend(channelTopic.getTopic(), chatMessage);
     }
 }

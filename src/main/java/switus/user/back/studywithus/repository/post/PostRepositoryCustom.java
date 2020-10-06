@@ -6,5 +6,7 @@ import switus.user.back.studywithus.domain.post.Post;
 import switus.user.back.studywithus.dto.PostDto;
 
 public interface PostRepositoryCustom {
-    Page<Post> findAll(Long roomId, PostDto.SearchRequest searchRequest, Pageable pageable);
+    Page<Post> findAllByRoom(Long roomId, PostDto.SearchRequest searchRequest, Pageable pageable);
+    Page<Post> findAllByJoinedRoomOrderByInsDate(Long accountId, Pageable pageable);
+    Post findDetail(Long postId);
 }

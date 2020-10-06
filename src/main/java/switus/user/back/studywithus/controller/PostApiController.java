@@ -3,11 +3,13 @@ package switus.user.back.studywithus.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 import switus.user.back.studywithus.common.annotaion.CurrentUser;
 import switus.user.back.studywithus.domain.account.Account;
+import switus.user.back.studywithus.domain.post.Post;
 import switus.user.back.studywithus.dto.MemberDto;
 import switus.user.back.studywithus.dto.PostDto;
 import switus.user.back.studywithus.dto.common.CommonResponse;
@@ -26,10 +28,10 @@ public class PostApiController {
 
     @ApiOperation("게시글 작성")
     @PostMapping("/room/{roomId}/post")
-    public CommonResponse write(@ApiIgnore @CurrentUser CurrentAccount account,
+    public CommonResponse create(@ApiIgnore @CurrentUser CurrentAccount account,
                                 @RequestBody PostDto.SaveRequest request,
                                 @PathVariable("roomId") Long roomId) {
-        postService.save(account.getId(), roomId, request);
+        postService.create(account.getId(), roomId, request);
         return CommonResponse.success();
     }
 
@@ -39,7 +41,8 @@ public class PostApiController {
     public CommonResponse posts(@PathVariable("roomId") Long roomId,
                                 PostDto.SearchRequest searchRequest,
                                 PageRequest pageRequest) {
-        return CommonResponse.success(postService.findAll(roomId, searchRequest, pageRequest.of()).map(PostDto.Response::new));
+        Page<Post> posts = postService.findAllByRoom(roomId, searchRequest, pageRequest.of());
+        return CommonResponse.success(posts.map(PostDto.Response::new));
     }
 
 
@@ -47,8 +50,8 @@ public class PostApiController {
     @GetMapping("/post/{postId}")
     public CommonResponse detail(@ApiIgnore @CurrentUser CurrentAccount account,
                                  @PathVariable("postId") Long postId) {
-        return CommonResponse.success(
-                new PostDto.DetailResponse(postService.findById(postId), account.getId()));
+        Post post = postService.findById(postId);
+        return CommonResponse.success(new PostDto.DetailResponse(post, account.getId()));
     }
 
 
@@ -68,6 +71,15 @@ public class PostApiController {
                                  @PathVariable("postId") Long postId) {
         postService.delete(account.getId(), postId);
         return CommonResponse.success();
+    }
+
+
+    @ApiOperation("내가 가입한 스터디룸의 새 게시글 리스트")
+    @GetMapping("/posts/new")
+    public CommonResponse newsFeed(@ApiIgnore @CurrentUser CurrentAccount account,
+                                   PageRequest pageRequest) {
+        Page<Post> posts = postService.findAllByJoinedRoomOrderByInsDate(account.getId(), pageRequest.of());
+        return CommonResponse.success(posts.map(PostDto.Response::new));
     }
 
 }

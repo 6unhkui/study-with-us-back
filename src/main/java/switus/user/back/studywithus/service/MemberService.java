@@ -29,16 +29,16 @@ public class MemberService {
     private final RoomService roomService;
 
 
-    public Member findById(Long id){
-        return memberRepository.findById(id).orElseThrow(() -> new NoContentException("존재하지 않는 멤버입니다."));
+    public Member findDetail(Long roomId){
+        return Optional.ofNullable(memberRepository.findDetail(roomId)).orElseThrow(() -> new NoContentException("존재하지 않는 멤버입니다."));
     }
 
-    public Optional<Member> findMember(Long accountId, Long roomId){
+    public Optional<Member> findByAccountAndRoom(Long accountId, Long roomId){
         return Optional.ofNullable(memberRepository.findMembership(accountId, roomId));
     }
 
     public Member findMembership(Long accountId, Long roomId){
-        return findMember(accountId, roomId).orElseThrow(() -> new NoContentException("존재하지 않는 멤버입니다."));
+        return findByAccountAndRoom(accountId, roomId).orElseThrow(() -> new NoContentException("존재하지 않는 멤버입니다."));
     }
 
     public Member findManagerByRoomId(Long roomId) {
@@ -49,10 +49,9 @@ public class MemberService {
        return memberRepository.findMembers(roomId, searchRequest, pageable);
     }
 
-
     @Transactional
     public void join(Long accountId, Long roomId) {
-        findMember(accountId, roomId).ifPresent(member -> {
+        findByAccountAndRoom(accountId, roomId).ifPresent(member -> {
             throw new DuplicateEntryException("이미 존재하는 멤버입니다.");
         });
 

@@ -14,6 +14,7 @@ import switus.user.back.studywithus.domain.account.Account;
 
 import javax.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static javax.persistence.FetchType.LAZY;
@@ -21,7 +22,6 @@ import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity
-@Where(clause = "del_Flag = false")
 @Getter @NoArgsConstructor(access = PROTECTED)
 public class Member extends BaseEntity {
 
@@ -34,18 +34,18 @@ public class Member extends BaseEntity {
     private MemberRole role = MemberRole.MATE;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "account_id")
+    @JoinColumn(name = "account_id", nullable = false)
     private Account account;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "room_id")
+    @JoinColumn(name = "room_id", nullable = false)
     private Room room;
 
     @OneToMany(mappedBy = "member")
-    private List<Post> posts;
+    private List<Post> posts = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
-    private List<Attendance> attendances;
+    private List<Attendance> attendances = new ArrayList<>();
 
 
     // == 연관 관계 편의 메소드 ==

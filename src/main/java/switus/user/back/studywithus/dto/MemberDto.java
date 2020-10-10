@@ -7,6 +7,7 @@ import switus.user.back.studywithus.domain.member.Member;
 import switus.user.back.studywithus.domain.member.MemberRole;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class MemberDto {
 
@@ -37,6 +38,14 @@ public class MemberDto {
             this.email = member.getAccount().getEmail();
             this.profileImg = member.getAccount().getProfileImg();
         }
+
+        public Response(Long memberId, MemberRole role, String name, String email, String profileImg) {
+            this.memberId = memberId;
+            this.role = role;
+            this.name = name;
+            this.email = email;
+            this.profileImg = profileImg;
+        }
     }
 
 
@@ -52,13 +61,31 @@ public class MemberDto {
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd", timezone = "Asia/Seoul")
         private LocalDateTime joinDate;
 
-        public DetailResponse(Member member){
+        private Long postCount;
+
+        private List<AttendanceDto.StatisticsResponse> attendanceStatistics;
+
+        public DetailResponse(){}
+
+        public DetailResponse(Member member, Long postCount, List<AttendanceDto.StatisticsResponse> attendanceStatistics){
             this.memberId = member.getId();
             this.role = member.getRole();
             this.joinDate = member.getInsDate();
             this.name = member.getAccount().getName();
             this.email = member.getAccount().getEmail();
             this.profileImg = member.getAccount().getProfileImg();
+            this.postCount = postCount;
+            this.attendanceStatistics = attendanceStatistics;
+        }
+
+        public DetailResponse(Member member, Long postCount){
+            this.memberId = member.getId();
+            this.role = member.getRole();
+            this.joinDate = member.getInsDate();
+            this.name = member.getAccount().getName();
+            this.email = member.getAccount().getEmail();
+            this.profileImg = member.getAccount().getProfileImg();
+            this.postCount = postCount;
         }
     }
 }

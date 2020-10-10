@@ -17,6 +17,8 @@ import switus.user.back.studywithus.domain.member.MemberRole;
 import switus.user.back.studywithus.dto.AttendanceDto;
 import switus.user.back.studywithus.dto.MemberDto;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -41,6 +43,18 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
     }
 
     @Override
+    public Member findMembership(Long memberId) {
+        return queryFactory.selectFrom(member)
+                .join(member.account, account).fetchJoin()
+                .join(member.room, room).fetchJoin()
+                .where(
+                        member.id.eq(memberId),
+                        member.delFlag.eq(false)
+                )
+                .fetchOne();
+    }
+
+    @Override
     public Member findManagerByRoomId(Long roomIdx) {
         return queryFactory.selectFrom(member)
                            .join(member.account, account).fetchJoin()
@@ -54,21 +68,29 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 
 
     @Override
-    public Page<Member> findMembers(Long roomId, MemberDto.SearchRequest searchRequest, Pageable pageable) {
-        QueryResults<Member> result = queryFactory.selectFrom(member)
-                                                  .rightJoin(member.room, room).on(room.id.eq(roomId))
-                                                  .join(member.account, account).fetchJoin()
-                                                  .where(
-                                                          member.delFlag.eq(false),
-                                                          likeKeyword(searchRequest.getKeyword())
-                                                  )
-                                                  .orderBy(
-                                                          order(MemberDto.SearchRequest.OrderType.ROLE),
-                                                          order(searchRequest.getOrderType())
-                                                  )
-                                                  .offset(pageable.getOffset())
-                                                  .limit(pageable.getPageSize())
-                                                  .fetchResults();
+    public Page<MemberDto.Response> findMembers(Long roomId, MemberDto.SearchRequest searchRequest, Pageable pageable) {
+        QueryResults<MemberDto.Response> result = queryFactory.select(
+                                                        Projections.constructor(MemberDto.Response.class,
+                                                            member.id,
+                                                            member.role,
+                                                            account.name,
+                                                            account.email,
+                                                            account.profileImg
+                                                        ))
+                                                    .from(member)
+                                                    .rightJoin(member.room, room).on(room.id.eq(roomId))
+                                                    .join(member.account, account).on(account.delFlag.eq(false))
+                                                    .where(
+                                                        member.delFlag.eq(false),
+                                                        likeKeyword(searchRequest.getKeyword())
+                                                    )
+                                                    .orderBy(
+                                                        order(MemberDto.SearchRequest.OrderType.ROLE),
+                                                        order(searchRequest.getOrderType())
+                                                    )
+                                                    .offset(pageable.getOffset())
+                                                    .limit(pageable.getPageSize())
+                                                    .fetchResults();
         return new PageImpl<>(result.getResults(), pageable, result.getTotal());
     }
 
@@ -96,18 +118,21 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                     ))
                 .from(member)
                 .innerJoin(member.room, room).on(room.id.eq(roomId))
-                .join(member.account, account)
+                .join(member.account, account).on(account.delFlag.eq(false))
                 .leftJoin(member.attendances, attendance).on(
                         Expressions.dateOperation(
                                 Date.class, Ops.DateTimeOps.DATE,
                                 attendance.insDate
                         ).eq(Expressions.currentDate())
+                )
+                .where(
+                        member.delFlag.eq(false)
                 ).fetchResults().getResults();
     }
 
 
     @Override
-    public List<AttendanceDto.StatisticsResponse> findMonthlyAttendanceCount(Long roomId, String date) {
+    public List<AttendanceDto.StatisticsResponse> findAllAttendanceCountByDateRange(Long roomId, String startDate, String endDate) {
         return queryFactory.select(
                 Projections.constructor(AttendanceDto.StatisticsResponse.class,
                         account.name,
@@ -115,15 +140,17 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 ))
                 .from(member)
                 .innerJoin(member.room, room).on(room.id.eq(roomId))
-                .join(member.account, account)
+                .join(member.account, account).on(account.delFlag.eq(false))
                 .leftJoin(member.attendances, attendance).on(
-                        attendance.insDate.month().eq(
-                                Expressions.dateTemplate(Date.class,"{0}", date).month()
-                        ),
-                        attendance.insDate.year().eq(
-                                Expressions.dateTemplate(Date.class,"{0}", date).year()
+                        attendance.insDate.between(
+                                LocalDate.parse(startDate).atStartOfDay(),
+                                LocalDate.parse(endDate).atTime(23,59)
                         )
-                ).groupBy(member).fetchResults().getResults();
+                )
+                .where(
+                        member.delFlag.eq(false)
+                )
+                .groupBy(member).fetchResults().getResults();
     }
 
 

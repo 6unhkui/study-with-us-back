@@ -8,9 +8,11 @@ import org.springframework.transaction.annotation.Transactional;
 import switus.user.back.studywithus.common.error.exception.BadRequestException;
 import switus.user.back.studywithus.common.error.exception.DuplicateEntryException;
 import switus.user.back.studywithus.common.error.exception.NoContentException;
+import switus.user.back.studywithus.common.error.exception.UnauthorizedException;
 import switus.user.back.studywithus.domain.account.Account;
 import switus.user.back.studywithus.domain.member.Member;
 import switus.user.back.studywithus.domain.member.MemberRole;
+import switus.user.back.studywithus.domain.post.Post;
 import switus.user.back.studywithus.domain.room.Room;
 import switus.user.back.studywithus.dto.MemberDto;
 import switus.user.back.studywithus.repository.member.MemberRepository;
@@ -41,11 +43,12 @@ public class MemberService {
         return findByAccountAndRoom(accountId, roomId).orElseThrow(() -> new NoContentException("존재하지 않는 멤버입니다."));
     }
 
+
     public Member findManagerByRoomId(Long roomId) {
         return memberRepository.findManagerByRoomId(roomId);
     }
 
-    public Page<Member> findMembers(Long roomId, MemberDto.SearchRequest searchRequest, Pageable pageable) {
+    public Page<MemberDto.Response> findMembers(Long roomId, MemberDto.SearchRequest searchRequest, Pageable pageable) {
        return memberRepository.findMembers(roomId, searchRequest, pageable);
     }
 
@@ -73,6 +76,19 @@ public class MemberService {
 
         if(member.getRole() == MemberRole.MANAGER) {
             throw new BadRequestException("매니저는 탈퇴를 진행 할 수 없습니다.");
+        }
+
+        member.withdrawal();
+    }
+
+
+    @Transactional
+    public void delete(Long memberId, Long currentAccountId) {
+        Member member = Optional.ofNullable(memberRepository.findMembership(memberId)).orElseThrow(() -> new NoContentException("존재하지 않는 멤버입니다."));
+
+        Member currentAccountMembership = findMembership(currentAccountId, member.getRoom().getId());
+        if(currentAccountMembership.getRole() != MemberRole.MANAGER) {
+            throw new BadRequestException("멤버 삭제는 매니저만 진행 할 수 있습니다.");
         }
 
         member.withdrawal();

@@ -10,10 +10,12 @@ import java.util.List;
 
 public interface MemberRepositoryCustom {
     Member findMembership(Long accountId, Long roomId);
+    Member findMembership(Long memberId);
     Member findManagerByRoomId(Long roomId);
-    Page<Member> findMembers(Long roomId, MemberDto.SearchRequest searchRequest, Pageable pageable);
+    Page<MemberDto.Response> findMembers(Long roomId, MemberDto.SearchRequest searchRequest, Pageable pageable);
     Member findDetail(Long memberId);
 
     List<AttendanceDto.MemberResponse> findAllAttendanceToday(Long roomId);
-    List<AttendanceDto.StatisticsResponse> findMonthlyAttendanceCount(Long roomId, String date);
+    List<AttendanceDto.StatisticsResponse> findAllAttendanceCountByDateRange(Long roomId, String startDate, String endDate);
+
 }

@@ -29,7 +29,7 @@ public class AttendanceApiController {
 
     @ApiOperation("출석 체크")
     @PostMapping("/room/{roomId}/attendance")
-    public CommonResponse attendance(@ApiIgnore @CurrentUser CurrentAccount account,
+    public CommonResponse register(@ApiIgnore @CurrentUser CurrentAccount account,
                                      @PathVariable("roomId") Long roomId,
                                      @RequestBody AttendanceDto.SaveRequest request) throws NotFoundException {
         Attendance save = attendanceService.save(account.getId(), roomId, request);
@@ -39,9 +39,9 @@ public class AttendanceApiController {
 
 
     @ApiOperation("금일 멤버별 출석 리스트")
-    @GetMapping("/room/{roomId}/attendance")
-    public CommonResponse getAttendance(@ApiIgnore @CurrentUser CurrentAccount account,
-                                        @PathVariable("roomId") Long roomId) throws NotFoundException {
+    @GetMapping("/room/{roomId}/attendance/members/today")
+    public CommonResponse getMembersAttendanceToday(@ApiIgnore @CurrentUser CurrentAccount account,
+                                                    @PathVariable("roomId") Long roomId) throws NotFoundException {
         // 금일 멤버별 출석 리스트
         List<AttendanceDto.MemberResponse> members = attendanceService.findMembersAttendanceToday(roomId);
         // 현재 접속한 계정의 출석 여부
@@ -50,12 +50,14 @@ public class AttendanceApiController {
     }
 
 
-    @ApiOperation("월별 멤버 출석 횟수")
-    @GetMapping("/room/{roomId}/attendance/monthly")
-    public CommonResponse getMemberAttendance(@ApiIgnore @CurrentUser CurrentAccount account,
-                                              @Param("date") String date,
-                                              @PathVariable("roomId") Long roomId) throws NotFoundException {
-        return CommonResponse.success(attendanceService.findMembersMonthlyAttendanceCount(roomId, date));
+    @ApiOperation("특정 기간 동안의 멤버별 출석 기록")
+    @GetMapping("/room/{roomId}/attendance/members")
+    public CommonResponse getMembersAttendanceCount(@ApiIgnore @CurrentUser CurrentAccount account,
+                                                    @Param("startDate") String startDate,
+                                                    @Param("endDate") String endDate,
+                                                    @PathVariable("roomId") Long roomId) throws NotFoundException {
+        return CommonResponse.success(attendanceService.findMembersAttendanceCountByDateRange(roomId, startDate, endDate));
     }
+
 
 }

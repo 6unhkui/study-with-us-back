@@ -94,12 +94,12 @@ public class MemberController {
     }
 
 
-    //TODO 스터디방 매니저 권한 위임
     @ApiOperation("매니저 권한 위임")
-    @PutMapping("/room/{roomId}/member/manager-delegation")
+    @PutMapping("/room/{roomId}/member/manager")
     public CommonResponse managerDelegation(@ApiIgnore @CurrentUser CurrentAccount account,
-                                            @Param("memberId") Long memberId,
-                                            @PathVariable("roomId") Long roomId) {
+                                            @PathVariable("roomId") Long roomId,
+                                            @Param("memberId") Long memberId) {
+        memberService.changeManager(roomId, memberId, account.getId());
         return CommonResponse.success();
     }
 }

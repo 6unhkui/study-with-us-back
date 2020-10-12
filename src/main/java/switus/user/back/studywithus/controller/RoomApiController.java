@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,9 +15,12 @@ import springfox.documentation.annotations.ApiIgnore;
 import switus.user.back.studywithus.common.error.exception.BadRequestException;
 import switus.user.back.studywithus.domain.account.Account;
 import switus.user.back.studywithus.common.annotaion.CurrentUser;
+import switus.user.back.studywithus.domain.category.Category;
 import switus.user.back.studywithus.domain.member.Member;
 import switus.user.back.studywithus.domain.member.MemberRole;
+import switus.user.back.studywithus.domain.room.Room;
 import switus.user.back.studywithus.dto.AccountDto;
+import switus.user.back.studywithus.dto.CategoryDto;
 import switus.user.back.studywithus.dto.RoomDto;
 import switus.user.back.studywithus.dto.common.CommonResponse;
 import switus.user.back.studywithus.dto.common.CurrentAccount;
@@ -25,8 +29,9 @@ import switus.user.back.studywithus.service.MemberService;
 import switus.user.back.studywithus.service.RoomService;
 
 import javax.validation.Valid;
+import java.util.Optional;
 
-@Api(tags = {"3. Room"})
+@Api(tags = {"Room"})
 @RestController
 @RequestMapping(value = "/api/v1", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
@@ -40,7 +45,6 @@ public class RoomApiController {
     @PostMapping("room")
     public CommonResponse<Long> create(@ApiIgnore @CurrentUser CurrentAccount account,
                                        @Valid @RequestBody RoomDto.SaveRequest request) throws NotFoundException {
-        System.out.println(request.toString());
         return CommonResponse.success(roomService.create(account.getId(), request));
     }
 
@@ -49,10 +53,10 @@ public class RoomApiController {
     @GetMapping("rooms")
     public CommonResponse<Page<RoomDto.Response>> rooms(RoomDto.SearchRequest searchRequest,
                                                         PageRequest pageRequest) throws NotFoundException {
-        return CommonResponse.success(
-                roomService.findAll(searchRequest, pageRequest.of()) // 스터디방 리스트를 찾고
-                           .map(room -> new RoomDto.Response(room, memberService.findManagerByRoomId(room.getId()))));
-                            // 각 스터디방의 매니저 계정 정보를 find
+        Page<Room> rooms = roomService.findAll(searchRequest, pageRequest.of());
+
+        // 각 스터디방의 매니저 정보를 함께 찾아 넣어준다.
+        return CommonResponse.success(rooms.map(room -> new RoomDto.Response(room, memberService.findManagerByRoomId(room.getId()))));
     }
 
 
@@ -62,9 +66,8 @@ public class RoomApiController {
     public CommonResponse<Page<RoomDto.Response>> roomsByCurrentAccount(@ApiIgnore @CurrentUser CurrentAccount account,
                                                                         RoomDto.SearchRequest searchRequest,
                                                                         PageRequest pageRequest) throws NotFoundException {
-        return CommonResponse.success(
-                roomService.findAllByAccountId(account.getId(), searchRequest, pageRequest.of())
-                           .map(room -> new RoomDto.Response(room, memberService.findManagerByRoomId(room.getId()))));
+        Page<Room> rooms = roomService.findAllByAccount(account.getId(), searchRequest, pageRequest.of());
+        return CommonResponse.success(rooms.map(room -> new RoomDto.Response(room, memberService.findManagerByRoomId(room.getId()))));
     }
 
 
@@ -73,10 +76,11 @@ public class RoomApiController {
     @GetMapping("room/{roomId}")
     public CommonResponse<RoomDto.DetailResponse> room(@ApiIgnore @CurrentUser CurrentAccount account,
                                                        @PathVariable("roomId") Long roomId) throws NotFoundException {
-        return CommonResponse.success(
-                new RoomDto.DetailResponse(roomService.findDetail(roomId),
-                                           memberService.findManagerByRoomId(roomId),
-                                           memberService.findMember(account.getId(), roomId)));
+
+        Room detail = roomService.findDetail(roomId);
+        Member manager = memberService.findManagerByRoomId(roomId);
+        Optional<Member> currentAccountMembership = memberService.findByAccountAndRoom(account.getId(), roomId);
+        return CommonResponse.success(new RoomDto.DetailResponse(detail, manager, currentAccountMembership));
     }
 
 
@@ -88,9 +92,39 @@ public class RoomApiController {
         if(!membership.getRole().equals(MemberRole.MANAGER)) {
             throw new BadRequestException("매니저 아닙니다.");
         }
+
         roomService.delete(membership.getRoom());
         return CommonResponse.success();
     }
 
+
+    @ApiOperation("스터디방 커버 이미지 변경")
+    @PutMapping("room/{roomId}/cover")
+    public CommonResponse changeCover(@ApiIgnore @CurrentUser CurrentAccount account,
+                                      @PathVariable("roomId") Long roomId,
+                                      @Param("coverId") Long coverId) {
+        roomService.changeCover(roomId, coverId);
+        return CommonResponse.success();
+    }
+
+
+    @ApiOperation("스터디방 카테고리 변경")
+    @PutMapping("room/{roomId}/category")
+    public CommonResponse changeCategory(@ApiIgnore @CurrentUser CurrentAccount account,
+                                         @PathVariable("roomId") Long roomId,
+                                         @Param("categoryId") Long categoryId) {
+        Category category = roomService.changeCategory(roomId, categoryId);
+        return CommonResponse.success(new CategoryDto.CategoryResponse(category));
+    }
+
+
+    @ApiOperation("스터디방 정보 변경")
+    @PutMapping("room/{roomId}")
+    public CommonResponse update(@ApiIgnore @CurrentUser CurrentAccount account,
+                                 @PathVariable("roomId") Long roomId,
+                                 @Valid @RequestBody RoomDto.UpdateRequest request) {
+        roomService.update(roomId, request);
+        return CommonResponse.success();
+    }
 
 }

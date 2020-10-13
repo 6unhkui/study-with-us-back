@@ -44,7 +44,12 @@ public class AttendanceService {
         return memberRepository.findAllAttendanceToday(roomId);
     }
 
-    public List<AttendanceDto.StatisticsResponse> findMembersMonthlyAttendanceCount(Long roomId, String date) {
-        return memberRepository.findMonthlyAttendanceCount(roomId, date);
+    public List<AttendanceDto.StatisticsResponse> findMembersAttendanceCountByDateRange(Long roomId, String startDate, String endDate) {
+        return memberRepository.findAllAttendanceCountByDateRange(roomId, startDate, endDate);
+    }
+
+
+    public List<AttendanceDto.StatisticsResponse> findMemberMonthlyAttendanceCount(Long memberId) {
+        return attendanceRepository.findMemberMonthlyAttendanceCount(memberId);
     }
 }

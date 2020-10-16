@@ -32,17 +32,20 @@ public class Post extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String content;
 
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "room_id", nullable = false)
+    private Room room;
 
     @ManyToOne(fetch = EAGER)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
-
-    @OneToMany(mappedBy = "post")
-    private List<PostComment> comments;
 
     @OneToOne(fetch = LAZY)
     @JoinColumn(referencedColumnName = "id", columnDefinition = "BigInt")
     private FileGroup fileGroup;
+
+    @OneToMany(mappedBy = "post")
+    private List<PostComment> comments;
 
     @Builder
     public Post(String title, String content) {
@@ -60,6 +63,11 @@ public class Post extends BaseEntity {
     }
 
     // === 연관관계 편의 메소드 ===
+    public void setRoom(Room room) {
+        room.getPosts().add(this);
+        this.room = room;
+    }
+
     public void setWriter(Member member) {
         member.getPosts().add(this);
         this.member = member;

@@ -79,7 +79,7 @@ public class AppConfig {
                     categories.add(Category.builder().name("개발").build());
                     categories.add(Category.builder().name("디자인").build());
                     categories.add(Category.builder().name("기타").build());
-                    categories.forEach(categoryRepository::save);
+                    categoryRepository.saveAll(categories);
                 }
             }
         };

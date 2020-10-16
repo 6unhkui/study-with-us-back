@@ -1,5 +1,7 @@
 package switus.user.back.studywithus.controller;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +20,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 
+@Api(tags = {"Chatting"})
 @RestController
 @RequiredArgsConstructor
 public class ChatController {
@@ -25,15 +28,19 @@ public class ChatController {
     private final ChatService chatService;
     private final AccountService accountService;
 
+    @ApiOperation("채팅방 이전 대화 목록")
     @GetMapping("/api/v1/chat/{roomId}/history")
     public CommonResponse history(@PathVariable("roomId") Long roomId) {
         return CommonResponse.success(chatService.getChatMessages(roomId));
     }
 
+
+    @ApiOperation("채팅방 현재 참여 멤버 리스트")
     @GetMapping("/api/v1/chat/{roomId}/members")
     public CommonResponse currentChatMembers(@PathVariable("roomId") Long roomId) {
         return CommonResponse.success(chatService.getChatMembers(roomId));
     }
+
 
     @MessageMapping("chat/message")
     public void message(ChatMessageDto message) {

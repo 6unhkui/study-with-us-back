@@ -7,22 +7,16 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
-import switus.user.back.studywithus.common.error.exception.BadRequestException;
-import switus.user.back.studywithus.common.error.exception.InternalServerException;
 import switus.user.back.studywithus.common.util.FileUtils;
 import switus.user.back.studywithus.common.util.ImageUtils;
 import switus.user.back.studywithus.common.util.MultilingualMessageUtils;
-import switus.user.back.studywithus.domain.account.Account;
 import switus.user.back.studywithus.common.annotaion.CurrentUser;
 import switus.user.back.studywithus.dto.AccountDto;
 import switus.user.back.studywithus.dto.common.CommonResponse;
 import switus.user.back.studywithus.dto.common.CurrentAccount;
 import switus.user.back.studywithus.service.AccountService;
-import switus.user.back.studywithus.service.FileService;
 
-import java.io.IOException;
-
-@Api(tags = {"2. Account"})
+@Api(tags = {"Account"})
 @RestController
 @RequestMapping(value = "/api/v1/account", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
@@ -51,7 +45,7 @@ public class AccountApiController {
 
 
     @ApiOperation(value = "프로필 이미지 등록", notes = "프로필 이미지를 리사이징 후 base64로 인코딩하여 저장하고, 그 문자열을 반환합니다.")
-    @PostMapping("/profile")
+    @PostMapping("/config")
     public CommonResponse<String> uploadProfileImg(@ApiIgnore @CurrentUser CurrentAccount account,
                                                    @RequestParam("file") MultipartFile file) {
         // 빈 파일 체크

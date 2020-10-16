@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Value;
 import switus.user.back.studywithus.domain.member.Member;
 import switus.user.back.studywithus.domain.member.MemberRole;
@@ -33,6 +34,28 @@ public class RoomDto {
         }
     }
 
+    @Setter
+    public static class UpdateRequest {
+        @NotNull
+        private String name;
+        private String description;
+        private boolean unlimited;
+        private int maxCount;
+
+        public String getName() {
+            return name;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public int getMaxCount() {
+            if(unlimited) maxCount = 0;
+            return maxCount;
+        }
+    }
+
     @Data
     public static class SearchRequest {
         public enum OrderType {
@@ -41,7 +64,7 @@ public class RoomDto {
 
         private OrderType orderType = OrderType.NAME;
         private String keyword;
-        private long[] categoriesId;
+        private long[] categoryIds;
     }
 
 
@@ -90,7 +113,10 @@ public class RoomDto {
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd", timezone = "Asia/Seoul")
         private LocalDateTime createDate;
 
+        private Long categoryId;
         private String category;
+
+        private Long coverGroupId;
         private String coverImage;
 
         private MemberDto.Response manager;
@@ -101,12 +127,14 @@ public class RoomDto {
         @JsonProperty("isMember")
         private boolean isMember;
 
+
         public DetailResponse(Room room, Member manager, Optional<Member> currentAccountMembership){
             this.roomId = room.getId();
             this.name = room.getName();
             this.description = room.getDescription();
             this.createDate = room.getInsDate();
             this.joinCount = room.getJoinCount();
+            this.categoryId = room.getCategory().getId();
             this.category = room.getCategory().getName();
 
             if(room.getMaxCount() != 0) {
@@ -115,6 +143,7 @@ public class RoomDto {
             }
 
             if(null != room.getCover() && room.getCover().getFiles().size() > 0) {
+                this.coverGroupId = room.getCover().getId();
                 this.coverImage = room.getCover().getFiles().get(0).getSaveName();
             }
 

@@ -32,7 +32,7 @@ public class PostCommentService {
     }
 
     @Transactional
-    public PostComment save(Long accountId, Long postId, PostCommentDto.SaveRequest request) {
+    public PostComment create(Long accountId, Long postId, PostCommentDto.SaveRequest request) {
         PostComment postComment = request.toEntity();
 
         Post post = postService.findById(postId);

@@ -12,4 +12,5 @@ public interface PostCommentRepositoryCustom {
     PostComment findMaxSeqByParent(Long parentId);
     PostComment findMaxSeq();
 
+
 }

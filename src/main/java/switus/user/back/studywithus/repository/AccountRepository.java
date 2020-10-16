@@ -13,5 +13,5 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     Optional<Account> findByEmail(String email);
 
     @Query("SELECT a FROM Account a WHERE a.id IN (:accountIds) and a.delFlag = false")
-    List<Account> findAccounts(@Param("accountIds") List<Long> accountIds);
+    List<Account> findAllById(@Param("accountIds") List<Long> accountIds);
 }

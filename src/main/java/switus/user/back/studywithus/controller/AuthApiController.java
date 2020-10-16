@@ -24,7 +24,7 @@ import javax.validation.Valid;
 import java.util.Optional;
 
 
-@Api(tags = {"1. Auth"})
+@Api(tags = {"Auth"})
 @RestController
 @RequestMapping(value = "/api/v1/auth", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
@@ -64,7 +64,7 @@ public class AuthApiController {
     public CommonResponse register(@Valid @RequestBody AccountDto.SaveRequest request) {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         request.setPassword(passwordEncoder.encode(request.getPassword()));
-        accountService.save(request);
+        accountService.create(request.toEntity());
         return CommonResponse.success();
     }
 

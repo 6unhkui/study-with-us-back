@@ -34,16 +34,9 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
 
-    @Transactional
-    public Account save(Account account){
-        validateDuplicateAccount(account);
-        accountRepository.save(account);
-        return account;
-    }
 
     @Transactional
-    public Long save(AccountDto.SaveRequest request){
-        Account account = request.toEntity();
+    public Long create(Account account){
         validateDuplicateAccount(account);
         accountRepository.save(account);
         return account.getId();
@@ -94,9 +87,5 @@ public class AccountService {
     public void delete(Long id) {
         Account account = findById(id);
         account.delete();
-    }
-
-    public List<Account> findAccounts(List<Long> accountIds) {
-        return accountRepository.findAccounts(accountIds);
     }
 }

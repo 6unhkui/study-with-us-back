@@ -78,4 +78,8 @@ public class Member extends BaseEntity {
         delete();
     }
 
+    public void changeRole(MemberRole role) {
+        this.role = role;
+    }
+
 }

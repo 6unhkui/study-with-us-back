@@ -19,6 +19,6 @@ public abstract class DateAudit {
     private LocalDateTime insDate;
 
     @LastModifiedDate
-    @Column(nullable = false, columnDefinition = "TIMESTAMP NOT NULL")
+    @Column(columnDefinition = "TIMESTAMP")
     private LocalDateTime updDate;
 }

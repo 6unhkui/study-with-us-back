@@ -27,10 +27,13 @@ public class PostCommentRepositoryImpl implements PostCommentRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
+
     @Override
     public List<PostComment> findByPost(Long postId) {
         QueryResults<PostComment> results = queryFactory.selectFrom(postComment)
                                                         .join(postComment.post, post).on(post.id.eq(postId))
+                                                        .leftJoin(postComment.member, member).fetchJoin()
+                                                        .join(member.account, account).fetchJoin()
                                                         .orderBy(postComment.seq.asc())
                                                         .fetchResults();
         return results.getResults();

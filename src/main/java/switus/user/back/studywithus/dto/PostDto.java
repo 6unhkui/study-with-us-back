@@ -67,6 +67,8 @@ public class PostDto {
         private int commentCount;
         private int fileCount;
 
+        private String roomName;
+
         public Response(Post post){
             this.postId = post.getId();
             this.title = post.getTitle();
@@ -79,6 +81,10 @@ public class PostDto {
             if(null != post.getFileGroup()) {
                 this.fileCount = post.getFileGroup().getFiles().size();
             }
+        }
+
+        public void setRoomName(String roomName) {
+            this.roomName = roomName;
         }
     }
 
@@ -119,7 +125,6 @@ public class PostDto {
                 this.fileGroupId = post.getFileGroup().getId();
                 this.files = post.getFileGroup().getFiles().stream().map(FileDto.Response::new).collect(Collectors.toList());
             }
-
         }
     }
 }

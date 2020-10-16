@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Where;
+import org.hibernate.annotations.WhereJoinTable;
 import switus.user.back.studywithus.domain.common.BaseEntity;
 
 import javax.persistence.*;
@@ -17,7 +18,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter @NoArgsConstructor(access = PROTECTED)
 public class FileInfo extends BaseEntity {
 
-    @Id @GeneratedValue(strategy = AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 

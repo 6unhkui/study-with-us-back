@@ -34,6 +34,20 @@ public class FileService {
     }
 
     @Transactional
+    public FileDto.FileGroupResponse changeFile(Long fileGroupId, FileDto.FileType fileType, MultipartFile file) {
+        FileGroup fileGroup = findFileGroup(fileGroupId);
+        // 기존에 등록된 파일은 삭제한다.
+        fileGroup.getFiles().forEach(f -> f.delete());
+
+        // 신규 파일을 등록한다.
+        FileInfo fileInfo = fileRepository.save(fileUtils.upload(fileType, file));
+        fileGroup.addFile(fileInfo);
+
+        return new FileDto.FileGroupResponse(fileGroup, Collections.singletonList(new FileDto.Response(fileInfo)));
+    }
+
+
+    @Transactional
     public FileGroup multiUpload(FileDto.FileType fileType, MultipartFile[] files) {
         List<FileInfo> fileInfoList = fileUtils.multiUpload(fileType, files);
         return fileGroupRepository.save(FileGroup.setFiles(fileRepository.saveAll(fileInfoList)));
@@ -54,7 +68,7 @@ public class FileService {
     }
 
     public FileGroup findFileGroup(Long fileGroupId) {
-        return fileGroupRepository.findById(fileGroupId).orElseThrow(() -> new NoContentException("존재하지 않는 파일입니다."));
+        return fileGroupRepository.findOneById(fileGroupId);
     }
 
 }

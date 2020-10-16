@@ -61,7 +61,7 @@ public class RoomService {
     }
 
 
-    public Page<Room> findAllByAccountId(Long accountId, RoomDto.SearchRequest searchRequest, Pageable pageable) {
+    public Page<Room> findAllByAccount(Long accountId, RoomDto.SearchRequest searchRequest, Pageable pageable) {
         return roomRepository.findAllByAccount(accountId, searchRequest, pageable);
     }
 
@@ -74,10 +74,36 @@ public class RoomService {
         return roomRepository.findDetail(roomId);
     }
 
-
     @Transactional
     public void delete(Room room) {
        room.delete();
+    }
+
+    @Transactional
+    public FileGroup changeCover(Long roomId, Long coverId) {
+        Room room = findById(roomId);
+        FileGroup fileGroup = fileService.findFileGroup(coverId);
+        room.setCover(fileGroup);
+
+        return fileGroup;
+    }
+
+    @Transactional
+    public Category changeCategory(Long roomId, Long categoryId) {
+        Room room = findById(roomId);
+        Category category = categoryService.findById(categoryId);
+        room.setCategory(category);
+
+        return category;
+    }
+
+
+    @Transactional
+    public Room update(Long roomId, RoomDto.UpdateRequest request) {
+        Room room = findById(roomId);
+
+        room.editRoom(request.getName(), request.getDescription(), request.getMaxCount());
+        return room;
     }
 
 }

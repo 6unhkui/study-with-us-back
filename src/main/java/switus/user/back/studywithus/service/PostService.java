@@ -16,6 +16,7 @@ import switus.user.back.studywithus.dto.PostDto;
 import switus.user.back.studywithus.repository.post.PostRepository;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -28,7 +29,7 @@ public class PostService {
 
 
     @Transactional
-    public Long save(Long accountId, Long roomId, PostDto.SaveRequest request) {
+    public Long create(Long accountId, Long roomId, PostDto.SaveRequest request) {
         Post post = request.toEntity();
 
         // 첨부 파일이 존재할 경우
@@ -39,16 +40,21 @@ public class PostService {
 
         Member member = memberService.findMembership(accountId, roomId);
         post.setWriter(member);
+        post.setRoom(member.getRoom());
 
         return postRepository.save(post).getId();
     }
 
-    public Page<Post> findAll(Long roomId,PostDto.SearchRequest searchRequest, Pageable pageable) {
-        return postRepository.findAll(roomId, searchRequest, pageable);
+    public Page<Post> findAllByRoom(Long roomId, PostDto.SearchRequest searchRequest, Pageable pageable) {
+        return postRepository.findAllByRoom(roomId, searchRequest, pageable);
+    }
+
+    public Page<Post> findAllByJoinedRoomOrderByInsDate(Long accountId, Pageable pageable) {
+        return postRepository.findAllByJoinedRoomOrderByInsDate(accountId, pageable);
     }
 
     public Post findById(Long id) {
-        return postRepository.findById(id).orElseThrow(() -> new NoContentException("존재하지 않는 게시물입니다."));
+        return Optional.ofNullable(postRepository.findDetail(id)).orElseThrow(() -> new NoContentException("존재하지 않는 게시물입니다."));
     }
 
     @Transactional
@@ -85,6 +91,14 @@ public class PostService {
                 && !manager.getId().equals(accountId)) {
             throw new UnauthorizedException("잘못된 권한의 요청입니다.");
         }
+    }
+
+    public Long countByRoom(Long roomId) {
+        return postRepository.countByRoom(roomId);
+    }
+
+    public Long countByMember(Long memberId) {
+       return postRepository.countByMember(memberId);
     }
 
 }

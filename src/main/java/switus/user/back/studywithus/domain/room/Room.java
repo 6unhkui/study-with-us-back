@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Where;
+import switus.user.back.studywithus.domain.attendance.Attendance;
 import switus.user.back.studywithus.domain.file.FileGroup;
 import switus.user.back.studywithus.domain.member.Member;
 import switus.user.back.studywithus.domain.post.Post;
@@ -48,6 +49,12 @@ public class Room extends BaseEntity {
     @OneToMany(mappedBy = "room")
     private List<Member> members = new ArrayList<>();
 
+    @OneToMany(mappedBy = "room")
+    private List<Post> posts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "room")
+    private List<Attendance> attendances = new ArrayList<>();
+
     @Builder
     public Room(String name, String description, int maxCount){
         this.name = name;
@@ -72,5 +79,11 @@ public class Room extends BaseEntity {
 
     public void decrementJoinCount() {
         joinCount = --joinCount;
+    }
+
+    public void editRoom(String name, String description, int maxCount) {
+        this.name = name;
+        this.description = description;
+        this.maxCount = maxCount;
     }
 }

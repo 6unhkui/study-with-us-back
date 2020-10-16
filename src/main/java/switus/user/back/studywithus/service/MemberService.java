@@ -43,6 +43,9 @@ public class MemberService {
         return findByAccountAndRoom(accountId, roomId).orElseThrow(() -> new NoContentException("존재하지 않는 멤버입니다."));
     }
 
+    public Member findMembership(Long memberId){
+        return Optional.ofNullable(memberRepository.findMembership(memberId)).orElseThrow(() -> new NoContentException("존재하지 않는 멤버입니다."));
+    }
 
     public Member findManagerByRoomId(Long roomId) {
         return memberRepository.findManagerByRoomId(roomId);
@@ -84,14 +87,29 @@ public class MemberService {
 
     @Transactional
     public void delete(Long memberId, Long currentAccountId) {
-        Member member = Optional.ofNullable(memberRepository.findMembership(memberId)).orElseThrow(() -> new NoContentException("존재하지 않는 멤버입니다."));
+        Member member = findMembership(memberId);
 
         Member currentAccountMembership = findMembership(currentAccountId, member.getRoom().getId());
-        if(currentAccountMembership.getRole() != MemberRole.MANAGER) {
+        if(!currentAccountMembership.getRole().equals(MemberRole.MANAGER)) {
             throw new BadRequestException("멤버 삭제는 매니저만 진행 할 수 있습니다.");
         }
 
         member.withdrawal();
+    }
+
+    @Transactional
+    public void changeManager(Long roomId, Long memberId, Long currentAccountId) {
+        // 현재 접속한 계정(매니저)의 매니저 권한을 멤버로 변경한다.
+        Member currentAccountMembership = findMembership(currentAccountId, roomId);
+        if(!currentAccountMembership.getRole().equals(MemberRole.MANAGER)) {
+            throw new BadRequestException("멤버 삭제는 매니저만 진행 할 수 있습니다.");
+        }
+
+        currentAccountMembership.changeRole(MemberRole.MATE);
+
+        // 대상 멤버를 매니저로 변경한다.
+        Member member = findMembership(memberId);
+        member.changeRole(MemberRole.MANAGER);
     }
 
 }

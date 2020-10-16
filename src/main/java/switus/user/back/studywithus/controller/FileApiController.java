@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import switus.user.back.studywithus.common.error.exception.BadRequestException;
 import switus.user.back.studywithus.common.error.exception.InternalServerException;
 import switus.user.back.studywithus.common.util.FileUtils;
 import switus.user.back.studywithus.common.util.ImageUtils;
@@ -22,8 +23,9 @@ import switus.user.back.studywithus.service.FileService;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Optional;
 
-@Api(tags = {"6. File"})
+@Api(tags = {"File"})
 @RestController
 @RequestMapping("/api/v1/files")
 @RequiredArgsConstructor
@@ -38,27 +40,20 @@ public class FileApiController {
 
     @ApiOperation("커버 이미지 등록")
     @PostMapping(value = "/cover", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public CommonResponse<FileDto.FileGroupResponse> uploadCoverImage(@RequestParam("file") MultipartFile file) {
+    public CommonResponse<FileDto.FileGroupResponse> uploadCoverImage(@RequestParam(value = "fileGroupId", required = false) Long fileGroupId,
+                                                                      @RequestParam("file") MultipartFile file) {
         // 빈 파일 체크
         fileUtils.isNotEmpty(file);
         // 이미지 파일 체크
         imageUtils.verifyImageFile(file);
 
-        // 파일을 서버에 업로드, 파일 테이블에 파일 정보 저장
-        FileGroup fileGroup = fileService.upload(FileDto.FileType.COVER, file);
-        return CommonResponse.success(new FileDto.FileGroupResponse(fileGroup));
-    }
-
-    @ApiOperation("커버 이미지 다운로드")
-    @GetMapping("/cover/{fileName}")
-    public ResponseEntity<Resource> getCoverImage(@PathVariable("fileName") String fileName) throws IOException {
-        Resource resource = fileUtils.loadAsResource(FileDto.FileType.COVER, fileName);
-        return ResponseEntity.ok()
-                             .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                             .cacheControl(CacheControl.noCache())
-                             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName + "")
-                             .contentLength(resource.getFile().length())
-                             .body(resource);
+        if(null != fileGroupId) {
+            // 커버 이미지를 변경할 경우
+            return CommonResponse.success(fileService.changeFile(fileGroupId, FileDto.FileType.COVER, file));
+        }else {
+            // 파일을 서버에 업로드, 파일 테이블에 파일 정보 저장
+            return CommonResponse.success(new FileDto.FileGroupResponse(fileService.upload(FileDto.FileType.COVER, file)));
+        }
     }
 
 
@@ -78,18 +73,6 @@ public class FileApiController {
         return CommonResponse.success(new FileDto.Response(fileInfo));
     }
 
-    @ApiOperation("에디터 이미지 다운로드")
-    @GetMapping("/editor/{fileName}")
-    public ResponseEntity<Resource> getEditorImage(@PathVariable("fileName") String fileName) throws IOException {
-        Resource resource = fileUtils.loadAsResource(FileDto.FileType.EDITOR, fileName);
-        return ResponseEntity.ok()
-                             .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                             .cacheControl(CacheControl.noCache())
-                             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName + "")
-                             .contentLength(resource.getFile().length())
-                             .body(resource);
-    }
-
 
     @ApiOperation("게시글 첨부파일 등록")
     @PostMapping(value = "/attachment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -98,7 +81,7 @@ public class FileApiController {
         // 요청 값으로 전달된 파일들이 빈 파일인지 체크한다.
         Arrays.stream(files).forEach(fileUtils::isNotEmpty);
 
-        if(fileGroupId != null) {
+        if(null != fileGroupId) {
             // 이미 등록된 파일 그룹에 파일을 추가로 업로드 할 경우
             return CommonResponse.success(new FileDto.FileGroupResponse(fileService.multiUpload(fileGroupId, FileDto.FileType.ATTACHMENT, files)));
         }else {
@@ -107,10 +90,13 @@ public class FileApiController {
     }
 
 
-    @ApiOperation("게시글 첨부파일 다운로드")
-    @GetMapping("/attachment/{fileName}")
-    public ResponseEntity<Resource> getAttachment(@PathVariable("fileName") String fileName) throws IOException {
-        Resource resource = fileUtils.loadAsResource(FileDto.FileType.ATTACHMENT, fileName);
+    @ApiOperation("파일 다운로드")
+    @GetMapping("/{fileType}/{fileName}")
+    public ResponseEntity<Resource> getAttachment(@PathVariable("fileType") String fileType,
+                                                  @PathVariable("fileName") String fileName) throws IOException {
+        FileDto.FileType type = Optional.of(FileDto.FileType.valueOf(fileType.toUpperCase()))
+                                        .orElseThrow(() -> new BadRequestException("존재하지 않는 파일 형식입니다."));
+        Resource resource = fileUtils.loadAsResource(type, fileName);
         return ResponseEntity.ok()
                              .contentType(MediaType.APPLICATION_OCTET_STREAM)
                              .cacheControl(CacheControl.noCache())

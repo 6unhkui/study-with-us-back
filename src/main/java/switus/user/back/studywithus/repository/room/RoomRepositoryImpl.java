@@ -2,6 +2,7 @@ package switus.user.back.studywithus.repository.room;
 
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -10,13 +11,17 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 
+import switus.user.back.studywithus.domain.member.Member;
 import switus.user.back.studywithus.domain.room.Room;
+import switus.user.back.studywithus.dto.MemberDto;
 import switus.user.back.studywithus.dto.RoomDto;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static switus.user.back.studywithus.domain.account.QAccount.account;
 import static switus.user.back.studywithus.domain.category.QCategory.category;
 import static switus.user.back.studywithus.domain.file.QFileGroup.fileGroup;
 import static switus.user.back.studywithus.domain.file.QFileInfo.fileInfo;
@@ -32,11 +37,11 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
     @Override
     public Room findDetail(Long roomId) {
         return queryFactory.selectFrom(room)
-                           .leftJoin(room.category, category).fetchJoin()
-//                           .leftJoin(room.cover, fileInfo).fetchJoin()
-                           .where(room.id.eq(roomId))
-                           .fetchOne();
+                .leftJoin(room.category, category).fetchJoin()
+                .where(room.id.eq(roomId))
+                .fetchOne();
     }
+
 
     @Override
     public Page<Room> findAll(RoomDto.SearchRequest searchRequest, Pageable pageable) {
@@ -46,7 +51,7 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
                                                 .leftJoin(fileGroup.files, fileInfo).fetchJoin()
                                                 .where(
                                                         likeKeyword(searchRequest.getKeyword()),
-                                                        inCategories(searchRequest.getCategoriesId())
+                                                        inCategories(searchRequest.getCategoryIds())
                                                 )
                                                 .orderBy(order(searchRequest.getOrderType()))
                                                 .offset(pageable.getOffset())
@@ -59,13 +64,13 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
     @Override
     public Page<Room> findAllByAccount(Long accountId, RoomDto.SearchRequest searchRequest, Pageable pageable) {
         QueryResults<Room> result = queryFactory.selectFrom(room)
-                                                .innerJoin(room.members, member).on(member.account.id.eq(accountId))
+                                                .join(room.members, member).on(member.account.id.eq(accountId), member.delFlag.eq(false))
                                                 .leftJoin(room.category, category).fetchJoin()
                                                 .leftJoin(room.cover, fileGroup).fetchJoin()
                                                 .leftJoin(fileGroup.files, fileInfo).fetchJoin()
                                                 .where(
                                                         likeKeyword(searchRequest.getKeyword()),
-                                                        inCategories(searchRequest.getCategoriesId())
+                                                        inCategories(searchRequest.getCategoryIds())
                                                 )
                                                 .orderBy(order(searchRequest.getOrderType()))
                                                 .offset(pageable.getOffset())

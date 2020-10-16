@@ -2,6 +2,8 @@ package switus.user.back.studywithus.domain.file;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Where;
+import org.hibernate.annotations.WhereJoinTable;
 import switus.user.back.studywithus.domain.member.Member;
 
 import javax.persistence.*;
@@ -9,13 +11,14 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static javax.persistence.GenerationType.AUTO;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity @Getter
 @NoArgsConstructor(access = PROTECTED)
 public class FileGroup {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToMany(mappedBy = "fileGroup")

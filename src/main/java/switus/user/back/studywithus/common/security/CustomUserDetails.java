@@ -6,6 +6,8 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import switus.user.back.studywithus.domain.account.AccountRole;
 import switus.user.back.studywithus.domain.account.AuthProvider;
@@ -140,4 +142,5 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
                 .nameAttributeKey(userNameAttributeName)
                 .build();
     }
+
 }

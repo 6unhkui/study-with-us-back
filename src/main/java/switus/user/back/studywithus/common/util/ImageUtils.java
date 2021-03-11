@@ -15,7 +15,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,8 +26,8 @@ import java.util.regex.Pattern;
 public class ImageUtils {
 
     private final MultilingualMessageUtils message;
-    private static int THUMBNAIL_W = 100;
-    private static int THUMBNAIL_H = 100;
+    private final static int THUMBNAIL_W = 100;
+    private final static int THUMBNAIL_H = 100;
 
     public String base64Encoding(BufferedImage src, String imageType) {
         StringBuilder encodeString = new StringBuilder();
@@ -72,12 +74,11 @@ public class ImageUtils {
     public static String extractImageFromHtml(String html) {
         Pattern pattern = Pattern.compile("<img[^>]*src=[\"']?([^>\"']+)[\"']?[^>]*>");
         Matcher match = pattern.matcher(html);
-        String imgTag = null;
-        if(match.find()) {
-            imgTag = match.group(1);
-        }
 
-        return imgTag;
+        if(match.find()) {
+            return match.group(1);
+        }
+        return "";
     }
 
 

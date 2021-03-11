@@ -48,7 +48,7 @@ public class AccountDto {
 
 
     @Data
-    public static class UpdateRequest {
+    public static class AccountUpdateRequest {
         private String name;
     }
 

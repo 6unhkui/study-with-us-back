@@ -14,9 +14,9 @@ import switus.user.back.studywithus.domain.room.Room;
 import switus.user.back.studywithus.domain.account.Account;
 import switus.user.back.studywithus.dto.RoomDto;
 import switus.user.back.studywithus.repository.member.MemberRepository;
+import switus.user.back.studywithus.repository.post.PostRepository;
 import switus.user.back.studywithus.repository.room.RoomRepository;
 
-import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -26,6 +26,7 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final MemberRepository memberRepository;
     private final CategoryService categoryService;
+    private final PostRepository postRepository;
 
     private final AccountService accountService;
     private final FileService fileService;
@@ -76,7 +77,7 @@ public class RoomService {
 
     @Transactional
     public void delete(Room room) {
-       room.delete();
+        room.delete();
     }
 
     @Transactional

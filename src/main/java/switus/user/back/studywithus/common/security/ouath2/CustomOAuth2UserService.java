@@ -6,6 +6,7 @@ import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserServ
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import switus.user.back.studywithus.common.security.CustomUserDetails;
@@ -37,6 +38,10 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         // OAuth2UserService를 통해 가져온 OAuth2User의 attribute를 CustomUserDetails에 담는다.
         CustomUserDetails userDetails = CustomUserDetails.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
+        // 유저 정보를 OAuth2 Provider에게서 전달받지 못했다면, Exception을 발생을 시킨다.
+        if(null == userDetails.getAccount().getEmail()) {
+            throw new OAuth2AuthenticationException(new OAuth2Error("401", "Access denied", "Full authentication is required to access this resource"));
+        }
 
         Account account = saveAccount(userDetails.getAccount().toEntity());
         userDetails.setAccount(new CurrentAccount(account));

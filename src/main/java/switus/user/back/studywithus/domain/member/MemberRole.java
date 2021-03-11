@@ -5,7 +5,7 @@ import switus.user.back.studywithus.domain.common.BaseEnumCode;
 
 @AllArgsConstructor
 public enum MemberRole implements BaseEnumCode<Integer> {
-    MATE(0), MANAGER(99);
+    MATE(0), MANAGER(99), ABSENT_MANAGER(80);
 
     private final Integer value;
 

@@ -1,0 +1,77 @@
+server :
+  port : 8443
+  ssl :
+    key-store : classpath:keystore.p12
+    key-store-type : PKCS12
+    key-store-password : switus1201
+
+---
+spring:
+  h2.console.enabled: true
+  datasource:
+    initialization-mode: never # always | never
+    schema: classpath*:db/mysql/schema.sql
+    url : jdbc:mysql://localhost:3306/switus?userUnicode=true
+    username : inkyung
+    password : Inkyung931201!
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    pool-name: hikari-cp
+    maximum-pool-size: 30
+    minimum-idle: 2
+    connectionTestQuery: SELECT 1
+    data-source-properties:
+      cachePrepStmts: true
+      prepStmtCacheSize: 250
+      prepStmtCacheSqlLimit: 2048
+      useServerPrepStmts: true
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+  servlet:
+    multipart: # Multipart properties
+      max-file-size: 200MB
+      max-request-size: 215MB
+      enabled: true
+  messages :
+    basename : i18n/exception
+    encoding : UTF-8
+
+#---
+#spring:
+#  mail:
+#    host: smtp.gmail.com
+#    port: 587
+#    username : studyinkyung@gmail.com
+#    password : aupiuybvkhykguql
+#    properties :
+#      mail.smtp:
+#        auth: true
+#        timeout : 5000
+#        starttls.enable : true
+
+---
+# Log
+logging:
+  level:
+    org.hibernate.SQL : debug
+
+# Log file
+default:
+  dir:
+    path: /home/inkyung/study_with_us/back
+  log:
+    path: ${default.dir.path}/logs
+
+---
+file:
+  path :
+    default : ${default.dir.path}/upload_files/
+    cover-image : ${file.path.default}/cover_images/
+    editor-image : ${file.path.default}/editor_images/
+    attachment : ${file.path.default}/attchment/
+
+---
+spring:
+  profiles:
+    include: auth

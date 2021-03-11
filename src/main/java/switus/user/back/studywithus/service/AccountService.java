@@ -66,7 +66,7 @@ public class AccountService {
 
 
     @Transactional
-    public void update(Long id, AccountDto.UpdateRequest request) {
+    public void update(Long id, AccountDto.AccountUpdateRequest request) {
         Account account = findById(id);
         account.changeName(request.getName());
     }

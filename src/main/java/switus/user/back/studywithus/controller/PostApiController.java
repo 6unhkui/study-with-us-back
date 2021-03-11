@@ -31,8 +31,7 @@ public class PostApiController {
     public CommonResponse create(@ApiIgnore @CurrentUser CurrentAccount account,
                                  @RequestBody PostDto.SaveRequest request,
                                  @PathVariable("roomId") Long roomId) {
-        postService.create(account.getId(), roomId, request);
-        return CommonResponse.success();
+        return CommonResponse.success(postService.create(account.getId(), roomId, request));
     }
 
 

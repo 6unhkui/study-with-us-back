@@ -34,7 +34,7 @@ out/
 .vscode/
 
 logs/
-src/main/resources/application-oauth.yml
+src/main/resources/config/**/application-auth.yml
 upload_files/
 
 enerated

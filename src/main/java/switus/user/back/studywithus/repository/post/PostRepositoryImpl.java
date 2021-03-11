@@ -36,11 +36,12 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
         QueryResults<Post> result = queryFactory.select(post)
                                                 .from(post)
-                                                .join(post.room, room).fetchJoin()
+                                                .rightJoin(post.room, room).fetchJoin()
                                                 .join(room.members, currentMember)
                                                 .join(currentMember.account, currentAccount).on(currentAccount.id.eq(accountId))
                                                 .leftJoin(post.member, writerMember).fetchJoin()
                                                 .join(writerMember.account, writerAccount).fetchJoin()
+                                                .where(room.delFlag.eq(false), currentMember.delFlag.eq(false))
                                                 .offset(pageable.getOffset())
                                                 .limit(pageable.getPageSize())
                                                 .orderBy(post.insDate.desc())

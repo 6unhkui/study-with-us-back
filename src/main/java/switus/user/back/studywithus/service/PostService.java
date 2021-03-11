@@ -65,6 +65,11 @@ public class PostService {
     }
 
     @Transactional
+    public void deleteAllByRoom(Long roomId) {
+        postRepository.deleteAllByRoom(roomId);
+    }
+
+    @Transactional
     public void update(Long accountId, Long postId, PostDto.UpdateRequest request)  {
         Post post = findById(postId);
         validateResourcePermission(post, accountId);

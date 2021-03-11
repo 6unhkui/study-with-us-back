@@ -38,14 +38,14 @@ public class AccountApiController {
     @ApiOperation(value = "계정 정보 수정")
     @PutMapping
     public CommonResponse update(@ApiIgnore @CurrentUser CurrentAccount account,
-                                 @RequestBody AccountDto.UpdateRequest request) {
+                                 @RequestBody AccountDto.AccountUpdateRequest request) {
         accountService.update(account.getId(), request);
         return CommonResponse.success();
     }
 
 
     @ApiOperation(value = "프로필 이미지 등록", notes = "프로필 이미지를 리사이징 후 base64로 인코딩하여 저장하고, 그 문자열을 반환합니다.")
-    @PostMapping("/config")
+    @PostMapping("/profile")
     public CommonResponse<String> uploadProfileImg(@ApiIgnore @CurrentUser CurrentAccount account,
                                                    @RequestParam("file") MultipartFile file) {
         // 빈 파일 체크

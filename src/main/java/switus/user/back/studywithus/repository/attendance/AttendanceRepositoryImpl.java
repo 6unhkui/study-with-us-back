@@ -37,7 +37,8 @@ public class AttendanceRepositoryImpl implements AttendanceRepositoryCustom{
                                 Date.class, Ops.DateTimeOps.DATE,
                                 attendance.insDate
                         ).eq(Expressions.currentDate())
-                ).fetchOne();
+                )
+                .fetchOne();
     }
 
 

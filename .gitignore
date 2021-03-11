@@ -33,8 +33,12 @@ out/
 ### VS Code ###
 .vscode/
 
+enerated
+
 logs/
-src/main/resources/config/**/application-auth.yml
 upload_files/
 
-enerated
+src/main/resources/config/local/application-auth.yml
+src/main/resources/config/prod/application-auth.yml
+
+src/main/resources/keystore.p12

@@ -9,6 +9,7 @@ import switus.user.back.studywithus.common.error.exception.BadRequestException;
 import switus.user.back.studywithus.common.error.exception.DuplicateEntryException;
 import switus.user.back.studywithus.common.error.exception.NoContentException;
 import switus.user.back.studywithus.common.error.exception.UnauthorizedException;
+import switus.user.back.studywithus.common.util.MultilingualMessageUtils;
 import switus.user.back.studywithus.domain.account.Account;
 import switus.user.back.studywithus.domain.member.Member;
 import switus.user.back.studywithus.domain.member.MemberRole;
@@ -26,13 +27,14 @@ import java.util.Optional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-
     private final AccountService accountService;
     private final RoomService roomService;
+    private final MultilingualMessageUtils message;
 
 
     public Member findDetail(Long roomId){
-        return Optional.ofNullable(memberRepository.findDetail(roomId)).orElseThrow(() -> new NoContentException("존재하지 않는 멤버입니다."));
+        return Optional.ofNullable(memberRepository.findDetail(roomId))
+                       .orElseThrow(() -> new NoContentException(message.makeMultilingualMessage("member.notExist")));
     }
 
     public Optional<Member> findByAccountAndRoom(Long accountId, Long roomId){
@@ -40,11 +42,13 @@ public class MemberService {
     }
 
     public Member findMembership(Long accountId, Long roomId){
-        return findByAccountAndRoom(accountId, roomId).orElseThrow(() -> new NoContentException("존재하지 않는 멤버입니다."));
+        return findByAccountAndRoom(accountId, roomId)
+                .orElseThrow(() -> new NoContentException(message.makeMultilingualMessage("member.notExist")));
     }
 
     public Member findMembership(Long memberId){
-        return Optional.ofNullable(memberRepository.findMembership(memberId)).orElseThrow(() -> new NoContentException("존재하지 않는 멤버입니다."));
+        return Optional.ofNullable(memberRepository.findMembership(memberId))
+                .orElseThrow(() -> new NoContentException(message.makeMultilingualMessage("member.notExist")));
     }
 
     public Member findManagerByRoomId(Long roomId) {
@@ -58,7 +62,7 @@ public class MemberService {
     @Transactional
     public void join(Long accountId, Long roomId) {
         findByAccountAndRoom(accountId, roomId).ifPresent(member -> {
-            throw new DuplicateEntryException("이미 존재하는 멤버입니다.");
+            throw new DuplicateEntryException(message.makeMultilingualMessage("member.isExist"));
         });
 
         Account account = accountService.findById(accountId);
@@ -78,7 +82,7 @@ public class MemberService {
         Member member = findMembership(accountId, roomId);
 
         if(member.getRole() == MemberRole.MANAGER) {
-            throw new BadRequestException("매니저는 탈퇴를 진행 할 수 없습니다.");
+            throw new BadRequestException(message.makeMultilingualMessage("member.managerCannotLeave"));
         }
 
         member.withdrawal();
@@ -91,7 +95,7 @@ public class MemberService {
 
         Member currentAccountMembership = findMembership(currentAccountId, member.getRoom().getId());
         if(!currentAccountMembership.getRole().equals(MemberRole.MANAGER)) {
-            throw new BadRequestException("멤버 삭제는 매니저만 진행 할 수 있습니다.");
+            throw new BadRequestException(message.makeMultilingualMessage("member.onlyManagerCanDeleteMember"));
         }
 
         member.withdrawal();
@@ -102,7 +106,7 @@ public class MemberService {
         // 현재 접속한 계정(매니저)의 매니저 권한을 멤버로 변경한다.
         Member currentAccountMembership = findMembership(currentAccountId, roomId);
         if(!currentAccountMembership.getRole().equals(MemberRole.MANAGER)) {
-            throw new BadRequestException("멤버 삭제는 매니저만 진행 할 수 있습니다.");
+            throw new BadRequestException(message.makeMultilingualMessage("member.onlyManagerCanDeleteMember"));
         }
 
         currentAccountMembership.changeRole(MemberRole.MATE);

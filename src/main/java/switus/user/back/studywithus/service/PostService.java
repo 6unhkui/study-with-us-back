@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import switus.user.back.studywithus.common.error.exception.BadRequestException;
 import switus.user.back.studywithus.common.error.exception.NoContentException;
 import switus.user.back.studywithus.common.error.exception.UnauthorizedException;
+import switus.user.back.studywithus.common.util.MultilingualMessageUtils;
 import switus.user.back.studywithus.domain.file.FileGroup;
 import switus.user.back.studywithus.domain.member.Member;
 import switus.user.back.studywithus.domain.post.Post;
@@ -26,6 +27,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final MemberService memberService;
     private final FileService fileService;
+    private final MultilingualMessageUtils message;
 
 
     @Transactional
@@ -54,7 +56,8 @@ public class PostService {
     }
 
     public Post findById(Long id) {
-        return Optional.ofNullable(postRepository.findDetail(id)).orElseThrow(() -> new NoContentException("존재하지 않는 게시물입니다."));
+        return Optional.ofNullable(postRepository.findDetail(id))
+                .orElseThrow(() -> new NoContentException(message.makeMultilingualMessage("post.notExist")));
     }
 
     @Transactional

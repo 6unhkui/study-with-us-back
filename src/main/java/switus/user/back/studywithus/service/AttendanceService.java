@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import switus.user.back.studywithus.common.error.exception.BadRequestException;
+import switus.user.back.studywithus.common.util.MultilingualMessageUtils;
 import switus.user.back.studywithus.domain.attendance.Attendance;
 import switus.user.back.studywithus.domain.member.Member;
 import switus.user.back.studywithus.dto.AttendanceDto;
@@ -21,11 +22,12 @@ public class AttendanceService {
     private final AttendanceRepository attendanceRepository;
     private final MemberRepository memberRepository;
     private final MemberService memberService;
+    private final MultilingualMessageUtils message;
 
     @Transactional
     public Attendance save(Long accountId, Long roomId, AttendanceDto.SaveRequest request) {
         findAccountAttendanceToday(accountId, roomId).ifPresent(value -> {
-            throw new BadRequestException("이미 오늘 출석체크를 진행한 멤버입니다.");
+            throw new BadRequestException(message.makeMultilingualMessage("attendance.attendedToday"));
         });
 
         Attendance attendance = request.toEntity();

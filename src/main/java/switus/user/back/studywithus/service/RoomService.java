@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import switus.user.back.studywithus.common.error.exception.NoContentException;
+import switus.user.back.studywithus.common.util.MultilingualMessageUtils;
 import switus.user.back.studywithus.domain.category.Category;
 import switus.user.back.studywithus.domain.file.FileGroup;
 import switus.user.back.studywithus.domain.member.Member;
@@ -30,6 +31,7 @@ public class RoomService {
 
     private final AccountService accountService;
     private final FileService fileService;
+    private final MultilingualMessageUtils message;
 
 
     @Transactional
@@ -68,7 +70,8 @@ public class RoomService {
 
 
     public Room findById(Long id) {
-        return roomRepository.findById(id).orElseThrow(() -> new NoContentException("존재하지 않는 스터디방입니다."));
+        return roomRepository.findById(id)
+                .orElseThrow(() -> new NoContentException(message.makeMultilingualMessage("room.notExist")));
     }
 
     public Room findDetail(Long roomId) {

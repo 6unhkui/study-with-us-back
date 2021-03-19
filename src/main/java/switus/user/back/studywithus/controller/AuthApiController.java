@@ -45,7 +45,7 @@ public class AuthApiController {
 
         // 소셜 계정이면 exception 발생
         if(account.getProvider() != AuthProvider.LOCAL){
-            throw new BadRequestException(message.makeMultilingualMessage("socialAccount"));
+            throw new BadRequestException(message.makeMultilingualMessage("account.socialAccount"));
         }
 
         // 비밀번호가 일치하면 토큰을 발급한다.
@@ -54,7 +54,7 @@ public class AuthApiController {
             return CommonResponse.success(token);
         }
 
-        throw new UnauthorizedException(message.makeMultilingualMessage("wrongPassword"));
+        throw new UnauthorizedException(message.makeMultilingualMessage("account.wrongPassword"));
     }
 
 

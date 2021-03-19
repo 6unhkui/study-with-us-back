@@ -48,18 +48,20 @@ public class AppConfig {
                  */
                 PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
                 Account user = Account.builder().email(accountProperties.getUserEmail())
-                                        .name("user").password(passwordEncoder.encode(accountProperties.getUserPassword()))
+                                        .name("user")
+                                        .password(passwordEncoder.encode(accountProperties.getUserPassword()))
                                         .role(AccountRole.USER)
                                         .provider(AuthProvider.LOCAL).build();
 
                 Account admin = Account.builder().email(accountProperties.getAdminEmail())
-                                        .name("admin").password(passwordEncoder.encode(accountProperties.getAdminPassword()))
+                                        .name("admin")
+                                        .password(passwordEncoder.encode(accountProperties.getAdminPassword()))
                                         .role(AccountRole.USER)
                                         .provider(AuthProvider.LOCAL).build();
 
-                Arrays.asList(user,admin).forEach(a -> {
-                    if(!accountRepository.findByEmail(a.getEmail()).isPresent()) {
-                        accountRepository.save(a);
+                Arrays.asList(user, admin).forEach(account -> {
+                    if(!accountRepository.findByEmail(account.getEmail()).isPresent()) {
+                        accountRepository.save(account);
                     }
                 });
 

@@ -39,6 +39,9 @@ logs/
 upload_files/
 
 src/main/resources/config/local/application-auth.yml
+src/main/resources/config/local/application-database.yml
+
 src/main/resources/config/prod/application-auth.yml
+src/main/resources/config/prod/application-database.yml
 
 src/main/resources/keystore.p12

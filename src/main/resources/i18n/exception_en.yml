@@ -1,5 +1,22 @@
-accountNotFound : "Account does not exist."
-wrongPassword : "Wrong password."
-socialAccount : "This is a social login account."
-accountExists : "Account already exists."
-fileUploadError : "An error occurred while uploading the file."
+account :
+  wrongPassword : "Wrong password."
+  isSocialAccount : "This is a social login account."
+  isExist : "Account already exists."
+  notFound : "Account does not exist."
+file :
+  uploadError : "An error occurred while uploading the file."
+category :
+  notExist : "This category does not exist"
+attendance :
+  attendedToday : "This member already attended today."
+member :
+  notExist : "This member does not exist"
+  isExist : "Member already exists."
+  managerCannotLeave : "The manager cannot leave."
+  onlyManagerCanDeleteMember : "Only the manager can delete the members."
+comment :
+  notExist : "This comment does not exist"
+post :
+  notExist : "This post does not exist"
+room :
+  notExist : "This study room does not exist"

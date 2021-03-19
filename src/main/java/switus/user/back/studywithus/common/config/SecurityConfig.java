@@ -14,12 +14,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.header.writers.frameoptions.WhiteListedAllowFromStrategy;
-import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.CorsUtils;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import switus.user.back.studywithus.common.security.*;
 import switus.user.back.studywithus.common.security.filter.CorsFilter;
 import switus.user.back.studywithus.common.security.filter.JwtAuthenticationFilter;
@@ -28,8 +22,6 @@ import switus.user.back.studywithus.common.security.ouath2.HttpCookieOAuth2Autho
 import switus.user.back.studywithus.common.security.ouath2.OAuth2AuthenticationFailureHandler;
 import switus.user.back.studywithus.common.security.ouath2.OAuth2AuthenticationSuccessHandler;
 import switus.user.back.studywithus.domain.account.AccountRole;
-
-import java.util.Arrays;
 
 
 @RequiredArgsConstructor

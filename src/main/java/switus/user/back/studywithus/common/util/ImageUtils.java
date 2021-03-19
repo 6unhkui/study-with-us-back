@@ -66,7 +66,7 @@ public class ImageUtils {
             BufferedImage image = makeThumbnail(read);
             return base64Encoding(image, fileExtension);
         } catch (IOException e) {
-            throw new InternalServerException(message.makeMultilingualMessage("fileUploadError"));
+            throw new InternalServerException(message.makeMultilingualMessage("file.uploadError"));
         }
     }
 

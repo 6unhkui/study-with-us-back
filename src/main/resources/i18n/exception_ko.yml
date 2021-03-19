@@ -1,5 +1,22 @@
-accountNotFound : "존재하지 않는 유저입니다."
-wrongPassword : "잘못된 비밀번호입니다."
-socialAccount : "소셜 로그인 계정입니다."
-accountExists : "이미 존재하는 유저입니다."
-fileUploadError : "파일 업로드 중에 에러가 발생하였습니다."
+account :
+  wrongPassword : "잘못된 비밀번호입니다."
+  isSocialAccount : "소셜 로그인 계정입니다."
+  isExist : "이미 존재하는 유저입니다."
+  notFound : "존재하지 않는 유저입니다."
+file :
+  uploadError : "파일 업로드 중에 에러가 발생하였습니다."
+category :
+  notExist : "존재하지 않는 카테고리입니다."
+attendance :
+  attendedToday : "이미 오늘 출석체크를 진행한 멤버입니다."
+member :
+  notExist : "존재하지 않는 멤버입니다."
+  isExist : "이미 존재하는 멤버입니다."
+  managerCannotLeave : "매니저를 탈퇴 할 수 없습니다."
+  onlyManagerCanDeleteMember : "오직 매니저만 멤버 탈퇴를 진행할 수 있습니다."
+comment :
+  notExist : "존재하지 않는 댓글입니다."
+post :
+  notExist : "존재하지 않는 게시글입니다."
+room :
+  notExist : "존재하지 않는 스터디방입니다."

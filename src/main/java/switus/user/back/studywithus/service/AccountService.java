@@ -1,13 +1,10 @@
 package switus.user.back.studywithus.service;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 import switus.user.back.studywithus.common.error.exception.BadRequestException;
 import switus.user.back.studywithus.common.error.exception.AccountNotFoundException;
 import switus.user.back.studywithus.common.util.ImageUtils;
@@ -16,12 +13,6 @@ import switus.user.back.studywithus.domain.account.Account;
 import switus.user.back.studywithus.dto.AccountDto;
 import switus.user.back.studywithus.repository.AccountRepository;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -44,7 +35,7 @@ public class AccountService {
 
     private void validateDuplicateAccount(Account account){
         accountRepository.findByEmail(account.getEmail()).ifPresent(value -> {
-            throw new BadRequestException(message.makeMultilingualMessage("accountExists"));
+            throw new BadRequestException(message.makeMultilingualMessage("account.isExist"));
         });
     }
 
@@ -77,7 +68,7 @@ public class AccountService {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         Account account = findById(id);
         if (!passwordEncoder.matches(request.getOldPassword(), account.getPassword())) {
-            throw new BadRequestException(message.makeMultilingualMessage("wrongPassword"));
+            throw new BadRequestException(message.makeMultilingualMessage("account.wrongPassword"));
         }else {
             account.changePassword(passwordEncoder.encode(request.getNewPassword()));
         }

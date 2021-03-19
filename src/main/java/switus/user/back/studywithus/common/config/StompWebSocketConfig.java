@@ -3,34 +3,27 @@ package switus.user.back.studywithus.common.config;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.event.EventListener;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
-import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import switus.user.back.studywithus.common.error.exception.UnauthorizedException;
 import switus.user.back.studywithus.common.security.CustomUserDetails;
 import switus.user.back.studywithus.common.security.JwtTokenProvider;
-import switus.user.back.studywithus.domain.account.Account;
 import switus.user.back.studywithus.domain.chat.ChatMember;
 import switus.user.back.studywithus.domain.chat.ChatMessage;
-import switus.user.back.studywithus.dto.AccountDto;
 import switus.user.back.studywithus.dto.ChatMessageDto;
 import switus.user.back.studywithus.service.ChatService;
 
-import java.security.Principal;
 import java.util.Objects;
 import java.util.Optional;
 
-import static java.lang.String.format;
 
 @Slf4j
 @Configuration

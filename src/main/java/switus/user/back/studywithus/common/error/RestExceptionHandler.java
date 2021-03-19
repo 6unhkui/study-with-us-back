@@ -193,7 +193,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(AccountNotFoundException.class)
     public ResponseEntity<Object> handleAccountNotFound(AccountNotFoundException ex) {
-        return buildResponseEntity(new ErrorResponse(HttpStatus.NOT_FOUND, message.makeMultilingualMessage("accountNotFound")));
+        return buildResponseEntity(new ErrorResponse(HttpStatus.NOT_FOUND, message.makeMultilingualMessage("account.notFound")));
     }
 
 

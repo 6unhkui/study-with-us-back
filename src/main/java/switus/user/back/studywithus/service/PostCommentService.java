@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import switus.user.back.studywithus.common.error.exception.NoContentException;
 import switus.user.back.studywithus.common.error.exception.UnauthorizedException;
+import switus.user.back.studywithus.common.util.MultilingualMessageUtils;
 import switus.user.back.studywithus.domain.member.Member;
 import switus.user.back.studywithus.domain.post.Post;
 import switus.user.back.studywithus.domain.post.PostComment;
@@ -26,6 +27,7 @@ public class PostCommentService {
     private final MemberService memberService;
     private final PostService postService;
     private final PostCommentRepository postCommentRepository;
+    private final MultilingualMessageUtils message;
 
     public List<PostComment> findByPost(Long postId) {
         return postCommentRepository.findByPost(postId);
@@ -65,7 +67,8 @@ public class PostCommentService {
 
 
     public PostComment findById(Long id) {
-       return postCommentRepository.findById(id).orElseThrow(() -> new NoContentException("존재하지 않는 댓글입니다."));
+       return postCommentRepository.findById(id)
+               .orElseThrow(() -> new NoContentException(message.makeMultilingualMessage("comment.notExist")));
     }
 
 

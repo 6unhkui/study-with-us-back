@@ -80,7 +80,7 @@ public class FileUtils {
         try {
             Files.copy(file.getInputStream(), dest, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            throw new InternalServerException(message.makeMultilingualMessage("fileUploadError"));
+            throw new InternalServerException(message.makeMultilingualMessage("file.uploadError"));
         }
 
         return FileInfo.builder().originName(originName)

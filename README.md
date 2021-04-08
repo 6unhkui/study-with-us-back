@@ -20,12 +20,6 @@ Study With Us는 자기 개발을 위해 공부하는 사람들이 모여 정보
 
 <br/>
 
-## 💻 Dev Environment
-
-- OS : Mac OS, CentOS 7
-- Tool : IntelliJ, Git
-  <br/><br/>
-
 ## 🔧 Tech Stack
 
 - Java 8

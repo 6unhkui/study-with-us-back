@@ -20,12 +20,6 @@ Study With Us는 자기 개발을 위해 공부하는 사람들이 모여 정보
 
 <br/>
 
-## 💻 Dev Environment
-
-- OS : Mac OS, CentOS 7
-- Tool : IntelliJ, Git
-  <br/><br/>
-
 ## 🔧 Tech Stack
 
 - Java 8
@@ -52,7 +46,7 @@ Study With Us는 자기 개발을 위해 공부하는 사람들이 모여 정보
 + src +- main +- java
               |    +- {Project Package}
               |           ├── common
-              |           |     ├── annotaion
+              |           |     ├── annotation
               |           |     ├── constant
               |           |     ├── error
               |           |     ├── properties
@@ -84,7 +78,7 @@ Study With Us는 자기 개발을 위해 공부하는 사람들이 모여 정보
 
 ```
 
-#### `common/annotaion`
+#### `common/annotation`
 
 커스텀 어노테이션을 모아둔 디렉토리입니다.
 

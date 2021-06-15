@@ -43,16 +43,16 @@ public class ImageUtils {
     }
 
 
-    public BufferedImage makeThumbnail(BufferedImage src) throws IOException {
+    public BufferedImage makeThumbnail(BufferedImage src, int width, int height) throws IOException {
         BufferedImage dest;
-        // 가로와 세로중
+        // 가로와 세로중 최소값
         int side = Math.min(src.getHeight(), src.getWidth());
 
         // 정사각형으로 크롭
         dest = Scalr.crop(src, (src.getWidth() - side) / 2, (src.getHeight() - side) / 2, side, side, (BufferedImageOp) null);
 
         // 리사이징
-        dest = Scalr.resize(dest, THUMBNAIL_W, THUMBNAIL_H, (BufferedImageOp) null);
+        dest = Scalr.resize(dest, width, height, (BufferedImageOp) null);
         return dest;
     }
 
@@ -63,7 +63,7 @@ public class ImageUtils {
 
         try {
             BufferedImage read = ImageIO.read(file.getInputStream());
-            BufferedImage image = makeThumbnail(read);
+            BufferedImage image = makeThumbnail(read, THUMBNAIL_W, THUMBNAIL_H);
             return base64Encoding(image, fileExtension);
         } catch (IOException e) {
             throw new InternalServerException(message.makeMultilingualMessage("file.uploadError"));

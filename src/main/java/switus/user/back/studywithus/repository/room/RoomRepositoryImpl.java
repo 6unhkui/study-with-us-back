@@ -53,7 +53,7 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
                                                         likeKeyword(searchRequest.getKeyword()),
                                                         inCategories(searchRequest.getCategoryIds())
                                                 )
-                                                .orderBy(order(searchRequest.getOrderType()))
+                                                .orderBy(order(searchRequest.getSortBy()))
                                                 .offset(pageable.getOffset())
                                                 .limit(pageable.getPageSize())
                                                 .fetchResults();
@@ -72,7 +72,7 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
                                                         likeKeyword(searchRequest.getKeyword()),
                                                         inCategories(searchRequest.getCategoryIds())
                                                 )
-                                                .orderBy(order(searchRequest.getOrderType()))
+                                                .orderBy(order(searchRequest.getSortBy()))
                                                 .offset(pageable.getOffset())
                                                 .limit(pageable.getPageSize())
                                                 .fetchResults();
@@ -98,12 +98,12 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
     }
 
 
-    private OrderSpecifier<?> order(RoomDto.SearchRequest.OrderType orderType) {
-        switch (orderType) {
+    private OrderSpecifier<?> order(RoomDto.SearchRequest.SortBy sortBy) {
+        switch (sortBy) {
             case CREATED_DATE:
                 return room.insDate.desc();
             case JOIN_COUNT:
-                return room.members.size().desc();
+                return room.joinCount.desc();
             default:
                 return room.name.asc();
         }

@@ -13,11 +13,11 @@ public class MemberDto {
 
     @Data
     public static class SearchRequest {
-        public enum OrderType {
+        public enum SortBy {
             NAME, JOIN_DATE, ROLE
         }
 
-        private OrderType orderType = OrderType.NAME;
+        private SortBy sortBy = SortBy.NAME;
         private String keyword;
     }
 

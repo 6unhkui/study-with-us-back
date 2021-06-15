@@ -58,11 +58,11 @@ public class RoomDto {
 
     @Data
     public static class SearchRequest {
-        public enum OrderType {
+        public enum SortBy {
             NAME, CREATED_DATE, JOIN_COUNT
         }
 
-        private OrderType orderType = OrderType.NAME;
+        private SortBy sortBy = SortBy.NAME;
         private String keyword;
         private long[] categoryIds;
     }

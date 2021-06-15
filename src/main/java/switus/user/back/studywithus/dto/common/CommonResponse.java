@@ -31,7 +31,7 @@ public class CommonResponse<T> {
 
 
     public static CommonResponse success(){
-        return new CommonResponse(true, HttpStatus.OK);
+        return CommonResponse.success(true);
     }
 
     public static <T> CommonResponse<T> success(T data){

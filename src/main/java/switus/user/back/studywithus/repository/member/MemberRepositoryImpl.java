@@ -85,8 +85,8 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                                                         likeKeyword(searchRequest.getKeyword())
                                                     )
                                                     .orderBy(
-                                                        order(MemberDto.SearchRequest.OrderType.ROLE),
-                                                        order(searchRequest.getOrderType())
+                                                        order(MemberDto.SearchRequest.SortBy.ROLE),
+                                                        order(searchRequest.getSortBy())
                                                     )
                                                     .offset(pageable.getOffset())
                                                     .limit(pageable.getPageSize())
@@ -161,8 +161,8 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
     }
 
 
-    private OrderSpecifier<?> order(MemberDto.SearchRequest.OrderType orderType) {
-        switch (orderType) {
+    private OrderSpecifier<?> order(MemberDto.SearchRequest.SortBy soryBy) {
+        switch (soryBy) {
             case JOIN_DATE:
                 return member.insDate.desc();
             case NAME:

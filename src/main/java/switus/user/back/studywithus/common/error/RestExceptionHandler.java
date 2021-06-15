@@ -128,7 +128,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(NoContentException.class)
     protected ResponseEntity<Object> handleNoContent(NoContentException ex) {
-        return buildResponseEntity(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage()));
+        return buildResponseEntity(new ErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage()));
     }
 
     @ExceptionHandler(DateTimeParseException.class)

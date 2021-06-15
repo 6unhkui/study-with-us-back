@@ -30,7 +30,7 @@ public class AttendanceRepositoryImpl implements AttendanceRepositoryCustom{
     public Attendance findAccountAttendanceToday(Long accountId, Long roomId) {
         return queryFactory.selectFrom(attendance)
                 .innerJoin(attendance.room, room).on(room.id.eq(roomId))
-                .innerJoin(attendance.member, member)
+                .innerJoin(attendance.member, member).on(member.delFlag.eq(false))
                 .innerJoin(member.account, account).on(account.id.eq(accountId))
                 .where(
                         Expressions.dateOperation(

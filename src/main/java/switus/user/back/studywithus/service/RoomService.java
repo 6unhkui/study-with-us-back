@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import switus.user.back.studywithus.common.error.exception.NoContentException;
+import switus.user.back.studywithus.common.error.exception.ResourceNotFoundException;
 import switus.user.back.studywithus.common.util.MultilingualMessageUtils;
 import switus.user.back.studywithus.domain.category.Category;
 import switus.user.back.studywithus.domain.file.FileGroup;
@@ -17,6 +18,8 @@ import switus.user.back.studywithus.dto.RoomDto;
 import switus.user.back.studywithus.repository.member.MemberRepository;
 import switus.user.back.studywithus.repository.post.PostRepository;
 import switus.user.back.studywithus.repository.room.RoomRepository;
+
+import java.util.Optional;
 
 
 @Service
@@ -49,13 +52,14 @@ public class RoomService {
         room.setCategory(category);
 
         // 생성한 스터디방을 저장한다.
-        roomRepository.save(room);
+        Room createdRoom = roomRepository.save(room);
 
         // 스터디 방을 만든 계정을 매니저로 가입시킨다
         Account account = accountService.findById(accountId);
         Member member = Member.join(account, room, MemberRole.MANAGER);
+        memberRepository.save(member);
 
-        return memberRepository.save(member).getId();
+        return createdRoom.getId();
     }
 
 
@@ -75,7 +79,8 @@ public class RoomService {
     }
 
     public Room findDetail(Long roomId) {
-        return roomRepository.findDetail(roomId);
+        return Optional.ofNullable(roomRepository.findDetail(roomId))
+                .orElseThrow(() -> new NoContentException(message.makeMultilingualMessage("room.notExist")));
     }
 
     @Transactional

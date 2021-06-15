@@ -17,6 +17,8 @@ import switus.user.back.studywithus.dto.common.CurrentAccount;
 import switus.user.back.studywithus.dto.common.PageRequest;
 import switus.user.back.studywithus.service.PostService;
 
+import java.util.Arrays;
+
 @Api(tags = {"Post"})
 @RestController
 @RequestMapping(value = "/api/v1", produces = MediaType.APPLICATION_JSON_VALUE)

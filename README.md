@@ -112,8 +112,8 @@ ErrorResponse DTO, Custom Exception, Exception Handler 클래스를 담고있습
 
 #### `common/pubsub`
 
-Stomp 인메모리 브로커만으로도 채팅 메시지를 Pub/Sub 방식으로 주고 받을 수 있지만, 메시지 브로커가 해당 서버 인스턴스로 제한되기 때문에 클러스터 환경에서는 문제가 발생 할 수 있습니다. 확장성을 고려해 Redis에 채팅 데이터를 적재하고 외부 메시지 브로커로서 사용하도록 구성하였습니다.<br/>
-이 디렉토리에는 클라이언트에게 전달받은 메시지를 Redis에 Publish하는 Publisher 클래스와 Redis Topic에 발행된 메시지를 채팅방을 구독하는 클라이언트에게 전달하는 Subscriber 클래스가 존재합니다.
+Stomp 인메모리 브로커만으로도 채팅 메시지를 Pub/Sub 방식으로 주고 받을 수 있지만, 메시지 브로커가 해당 서버 인스턴스로 제한되기 때문에 클러스터 환경에서는 문제가 발생 할 수 있습니다. 확장성을 고려해 Redis에 채팅 데이터를 저장하고 외부 메시지 브로커로서 사용하도록 구성하였습니다.<br/>
+이 디렉토리에는 클라이언트에게 전달받은 메시지를 Redis에 발행하는 Publisher 클래스와 Redis Topic에 발행된 메시지를 채팅방을 구독하는 클라이언트에게 전달하는 Subscriber 클래스가 존재합니다.
 
 #### `common/security`
 

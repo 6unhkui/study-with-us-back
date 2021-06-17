@@ -1,4 +1,4 @@
-# Study With Us - Server
+# 📚 Study With Us - Backend
 
 ![Study With Us](https://user-images.githubusercontent.com/41765537/122437155-68035f80-cfd4-11eb-944c-60203c0d90aa.gif)
 <br/>
